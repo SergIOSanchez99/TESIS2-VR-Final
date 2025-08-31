@@ -1,0 +1,199 @@
+{% extends "base.html" %} {% block title %}RehaVR - Registro{% endblock %} {%
+block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <h2 class="display-6 fw-bold text-primary">
+              <i class="fas fa-user-plus me-2"></i>Registro de Paciente
+            </h2>
+            <p class="text-muted">
+              Crea tu cuenta para comenzar tu rehabilitación
+            </p>
+          </div>
+
+          <form id="registroForm">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">
+                <i class="fas fa-user me-2"></i>Nombre Completo
+              </label>
+              <input
+                type="text"
+                class="form-control form-control-lg"
+                id="nombre"
+                name="nombre"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">
+                <i class="fas fa-envelope me-2"></i>Correo Electrónico
+              </label>
+              <input
+                type="email"
+                class="form-control form-control-lg"
+                id="email"
+                name="email"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">
+                <i class="fas fa-lock me-2"></i>Contraseña
+              </label>
+              <input
+                type="password"
+                class="form-control form-control-lg"
+                id="password"
+                name="password"
+                minlength="6"
+                required
+              />
+              <div class="form-text">Mínimo 6 caracteres</div>
+            </div>
+
+            <div class="mb-4">
+              <label for="edad" class="form-label">
+                <i class="fas fa-birthday-cake me-2"></i>Edad
+              </label>
+              <input
+                type="number"
+                class="form-control form-control-lg"
+                id="edad"
+                name="edad"
+                min="1"
+                max="120"
+                required
+              />
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Registrarse
+              </button>
+              <a
+                href="{{ url_for('index') }}"
+                class="btn btn-outline-secondary"
+              >
+                <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+              </a>
+            </div>
+          </form>
+
+          <div class="text-center mt-4">
+            <p class="text-muted">
+              ¿Ya tienes una cuenta?
+              <a
+                href="{{ url_for('login') }}"
+                class="text-primary text-decoration-none"
+              >
+                Inicia sesión aquí
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert Modal -->
+<div class="modal fade" id="alertModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Información</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Content will be inserted here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document
+    .getElementById("registroForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const edad = document.getElementById("edad").value.trim();
+
+      if (!nombre || !email || !password || !edad) {
+        showAlert("Error", "Por favor, completa todos los campos.", "danger");
+        return;
+      }
+
+      if (password.length < 6) {
+        showAlert("Error", "La contraseña debe tener al menos 6 caracteres.", "danger");
+        return;
+      }
+
+      try {
+        const response = await fetch("/registro", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nombre: nombre,
+            email: email,
+            password: password,
+            edad: edad,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showAlert("¡Éxito!", data.message, "success");
+          setTimeout(() => {
+            window.location.href = "/dashboard";
+          }, 1500);
+        } else {
+          showAlert("Error", data.error, "danger");
+        }
+      } catch (error) {
+        showAlert(
+          "Error",
+          "Ocurrió un error al procesar tu registro.",
+          "danger"
+        );
+      }
+    });
+
+  function showAlert(title, message, type) {
+    const modal = new bootstrap.Modal(document.getElementById("alertModal"));
+    document.getElementById("modalTitle").textContent = title;
+    document.getElementById("modalBody").textContent = message;
+
+    // Update modal styling based on type
+    const modalContent = document.querySelector("#alertModal .modal-content");
+    modalContent.className = "modal-content";
+    if (type === "success") {
+      modalContent.classList.add("border-success");
+    } else if (type === "danger") {
+      modalContent.classList.add("border-danger");
+    }
+
+    modal.show();
+  }
+</script>
+{% endblock %}

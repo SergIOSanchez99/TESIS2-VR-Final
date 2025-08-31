@@ -1,0 +1,314 @@
+{% extends "base.html" %} {% block title %}RehaVR - Ejercicio Nivel {{ nivel
+}}{% endblock %} {% block extra_css %}
+<style>
+  .game-container {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  #gameCanvas {
+    border: 2px solid #1976d2;
+    border-radius: 10px;
+    cursor: crosshair;
+  }
+
+  .game-info {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .timer {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1976d2;
+  }
+
+  .score {
+    font-size: 1.2rem;
+    color: #43a047;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="game-container">
+        <div class="text-center mb-4">
+          <h2 class="text-primary">
+            <i class="fas fa-gamepad me-2"></i>
+            Ejercicio Nivel {{ nivel }}
+          </h2>
+          <p class="text-muted">
+            {% if nivel == 1 %} Objetivo estático - Haz clic en el objetivo azul
+            {% elif nivel == 2 %} Objetivo en movimiento lento - Sigue el
+            objetivo azul {% else %} Objetivo en movimiento rápido - ¡Demuestra
+            tu precisión! {% endif %}
+          </p>
+        </div>
+
+        <div class="game-info">
+          <div class="row text-center">
+            <div class="col-md-4">
+              <div class="timer" id="timer">Tiempo: 60s</div>
+            </div>
+            <div class="col-md-4">
+              <div class="score" id="score">Puntos: 0</div>
+            </div>
+            <div class="col-md-4">
+              <div class="score" id="hits">Aciertos: 0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mb-3">
+          <canvas id="gameCanvas" width="600" height="400"></canvas>
+        </div>
+
+        <div class="text-center">
+          <button id="startBtn" class="btn btn-primary btn-lg me-2">
+            <i class="fas fa-play me-2"></i>Comenzar
+          </button>
+          <button
+            id="pauseBtn"
+            class="btn btn-warning btn-lg me-2"
+            style="display: none"
+          >
+            <i class="fas fa-pause me-2"></i>Pausar
+          </button>
+          <a
+            href="{{ url_for('dashboard') }}"
+            class="btn btn-outline-secondary btn-lg"
+          >
+            <i class="fas fa-arrow-left me-2"></i>Volver
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Result Modal -->
+<div class="modal fade" id="resultModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Resultado del Ejercicio</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="resultContent">
+          <!-- Content will be inserted here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="window.location.href='/dashboard'"
+        >
+          <i class="fas fa-home me-2"></i>Volver al Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const timerElement = document.getElementById('timer');
+  const scoreElement = document.getElementById('score');
+  const hitsElement = document.getElementById('hits');
+
+  let gameRunning = false;
+  let gamePaused = false;
+  let timeLeft = 60;
+  let score = 0;
+  let hits = 0;
+  let target = { x: 0, y: 0, size: 30 };
+  let gameInterval;
+  let timerInterval;
+
+  const nivel = {{ nivel }};
+
+  function initGame() {
+      // Reset game state
+      timeLeft = 60;
+      score = 0;
+      hits = 0;
+      gameRunning = false;
+      gamePaused = false;
+
+      updateDisplay();
+      drawTarget();
+  }
+
+  function drawTarget() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw target
+      ctx.fillStyle = '#1976d2';
+      ctx.beginPath();
+      ctx.arc(target.x, target.y, target.size, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Draw target border
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+  }
+
+  function moveTarget() {
+      if (nivel === 1) {
+          // Static target - no movement
+          return;
+      }
+
+      const speed = nivel === 2 ? 2 : 4;
+      const margin = target.size;
+
+      // Move target
+      target.x += (Math.random() - 0.5) * speed;
+      target.y += (Math.random() - 0.5) * speed;
+
+      // Keep target within bounds
+      target.x = Math.max(margin, Math.min(canvas.width - margin, target.x));
+      target.y = Math.max(margin, Math.min(canvas.height - margin, target.y));
+  }
+
+  function checkHit(mouseX, mouseY) {
+      const distance = Math.sqrt(
+          Math.pow(mouseX - target.x, 2) + Math.pow(mouseY - target.y, 2)
+      );
+
+      if (distance <= target.size) {
+          hits++;
+          score += nivel * 10;
+
+          // Move target to new random position
+          target.x = Math.random() * (canvas.width - 2 * target.size) + target.size;
+          target.y = Math.random() * (canvas.height - 2 * target.size) + target.size;
+
+          updateDisplay();
+          return true;
+      }
+
+      return false;
+  }
+
+  function updateDisplay() {
+      timerElement.textContent = `Tiempo: ${timeLeft}s`;
+      scoreElement.textContent = `Puntos: ${score}`;
+      hitsElement.textContent = `Aciertos: ${hits}`;
+  }
+
+  function startGame() {
+      if (gameRunning) return;
+
+      gameRunning = true;
+      startBtn.style.display = 'none';
+      pauseBtn.style.display = 'inline-block';
+
+      // Start timer
+      timerInterval = setInterval(() => {
+          if (!gamePaused) {
+              timeLeft--;
+              updateDisplay();
+
+              if (timeLeft <= 0) {
+                  endGame();
+              }
+          }
+      }, 1000);
+
+      // Start game loop
+      gameInterval = setInterval(() => {
+          if (!gamePaused) {
+              moveTarget();
+              drawTarget();
+          }
+      }, 50);
+  }
+
+  function pauseGame() {
+      gamePaused = !gamePaused;
+      pauseBtn.innerHTML = gamePaused ?
+          '<i class="fas fa-play me-2"></i>Continuar' :
+          '<i class="fas fa-pause me-2"></i>Pausar';
+  }
+
+  function endGame() {
+      clearInterval(gameInterval);
+      clearInterval(timerInterval);
+      gameRunning = false;
+
+      // Calculate success based on hits and score
+      const success = hits >= (nivel * 3) && score >= (nivel * 50);
+
+      // Send result to server
+      fetch('/api/registrar_resultado', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              nivel: nivel,
+              exito: success
+          })
+      });
+
+      // Show result modal
+      const modal = new bootstrap.Modal(document.getElementById('resultModal'));
+      const resultContent = document.getElementById('resultContent');
+
+      if (success) {
+          resultContent.innerHTML = `
+              <div class="text-success mb-3">
+                  <i class="fas fa-trophy fa-3x"></i>
+              </div>
+              <h4 class="text-success">¡Excelente trabajo!</h4>
+              <p>Has completado el ejercicio con éxito.</p>
+              <p><strong>Puntos:</strong> ${score} | <strong>Aciertos:</strong> ${hits}</p>
+          `;
+      } else {
+          resultContent.innerHTML = `
+              <div class="text-warning mb-3">
+                  <i class="fas fa-exclamation-triangle fa-3x"></i>
+              </div>
+              <h4 class="text-warning">Necesitas más práctica</h4>
+              <p>Continúa practicando para mejorar tus habilidades.</p>
+              <p><strong>Puntos:</strong> ${score} | <strong>Aciertos:</strong> ${hits}</p>
+          `;
+      }
+
+      modal.show();
+  }
+
+  // Event listeners
+  startBtn.addEventListener('click', startGame);
+  pauseBtn.addEventListener('click', pauseGame);
+
+  canvas.addEventListener('click', (e) => {
+      if (!gameRunning || gamePaused) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      checkHit(mouseX, mouseY);
+  });
+
+  // Initialize game
+  initGame();
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=True
+      - SECRET_KEY=rehavr_secret_key_2024
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    depends_on:
+      - frontend
+    networks:
+      - rehavr-network
+
+  # Frontend React
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - rehavr-network
+
+  # Base de datos (opcional para futuras versiones)
+  # db:
+  #   image: postgres:13
+  #   environment:
+  #     - POSTGRES_DB=rehavr
+  #     - POSTGRES_USER=rehavr_user
+  #     - POSTGRES_PASSWORD=rehavr_password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - rehavr-network
+
+networks:
+  rehavr-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

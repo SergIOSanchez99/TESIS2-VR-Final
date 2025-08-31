@@ -1,0 +1,160 @@
+{% extends "base.html" %} {% block title %}RehaVR - Iniciar Sesión{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <h2 class="display-6 fw-bold text-primary">
+              <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+            </h2>
+            <p class="text-muted">
+              Accede a tu cuenta para continuar tu rehabilitación
+            </p>
+          </div>
+
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="email" class="form-label">
+                <i class="fas fa-envelope me-2"></i>Correo Electrónico
+              </label>
+              <input
+                type="email"
+                class="form-control form-control-lg"
+                id="email"
+                name="email"
+                required
+              />
+            </div>
+
+            <div class="mb-4">
+              <label for="password" class="form-label">
+                <i class="fas fa-lock me-2"></i>Contraseña
+              </label>
+              <input
+                type="password"
+                class="form-control form-control-lg"
+                id="password"
+                name="password"
+                required
+              />
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+              </button>
+              <a
+                href="{{ url_for('index') }}"
+                class="btn btn-outline-secondary"
+              >
+                <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+              </a>
+            </div>
+          </form>
+
+          <div class="text-center mt-4">
+            <p class="text-muted">
+              ¿No tienes una cuenta?
+              <a
+                href="{{ url_for('registro') }}"
+                class="text-primary text-decoration-none"
+              >
+                Regístrate aquí
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert Modal -->
+<div class="modal fade" id="alertModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Información</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Content will be inserted here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document
+    .getElementById("loginForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email || !password) {
+        showAlert("Error", "Por favor, completa todos los campos.", "danger");
+        return;
+      }
+
+      try {
+        const response = await fetch("/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showAlert("¡Bienvenido!", data.message, "success");
+          setTimeout(() => {
+            window.location.href = "/dashboard";
+          }, 1500);
+        } else {
+          showAlert("Error", data.error, "danger");
+        }
+      } catch (error) {
+        showAlert(
+          "Error",
+          "Ocurrió un error al procesar tu inicio de sesión.",
+          "danger"
+        );
+      }
+    });
+
+  function showAlert(title, message, type) {
+    const modal = new bootstrap.Modal(document.getElementById("alertModal"));
+    document.getElementById("modalTitle").textContent = title;
+    document.getElementById("modalBody").textContent = message;
+
+    // Update modal styling based on type
+    const modalContent = document.querySelector("#alertModal .modal-content");
+    modalContent.className = "modal-content";
+    if (type === "success") {
+      modalContent.classList.add("border-success");
+    } else if (type === "danger") {
+      modalContent.classList.add("border-danger");
+    }
+
+    modal.show();
+  }
+</script>
+{% endblock %}
