@@ -172,10 +172,8 @@ npm run build
 
 ## 📚 Documentación
 
-- **[API Documentation](./API_DOCUMENTATION.md)** - Documentación completa de todas las APIs
+- **[Guía de Despliegue](./GUIA_DEPLOY.md)** - Guía completa con pasos para capturas (Scrum)
 - **[Arquitectura](./ARQUITECTURA.md)** - Arquitectura del sistema
-- **[Arquitectura de Producción](./ARQUITECTURA_PRODUCCION.md)** - Optimización para producción
-- **[Guía de Ejecución](./EJECUTAR_PROYECTO.md)** - Instrucciones detalladas de ejecución
 - **[Diagramas UML](./INSTRUCCIONES_DIAGRAMAS_UML.md)** - Instrucciones para generar diagramas
 
 ## 🔒 Seguridad
