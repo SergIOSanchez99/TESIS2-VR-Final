@@ -1,0 +1,363 @@
+@startuml DiagramaUMLArquitecturaRehaVR
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+skinparam roundcorner 10
+skinparam class {
+    BackgroundColor<<Config>> #E3F2FD
+    BackgroundColor<<Controller>> #FFF3E0
+    BackgroundColor<<Service>> #E8F5E9
+    BackgroundColor<<Model>> #F3E5F5
+    BackgroundColor<<Repository>> #FCE4EC
+    BackgroundColor<<Database>> #FFF9C4
+    BackgroundColor<<Blueprint>> #E0F2F1
+}
+
+title Diagrama UML de Arquitectura - Sistema RehaVR\nSistema de Rehabilitación Motora con Patrón MVC
+
+' ============================================================================
+' CAPA DE CONFIGURACIÓN
+' ============================================================================
+package "Capa de Configuración" <<Config>> {
+    class Config {
+        +SECRET_KEY: str
+        +DEBUG: bool
+        +TESTING: bool
+        +DATA_PATH: str
+        +MYSQL_HOST: str
+        +MYSQL_PORT: int
+        +CORS_ORIGINS: list
+        +SESSION_TYPE: str
+        +PERMANENT_SESSION_LIFETIME: int
+        +init_app(app): void
+    }
+    
+    class DevelopmentConfig {
+        +DEBUG: bool = True
+        +LOG_LEVEL: str = "DEBUG"
+    }
+    
+    class ProductionConfig {
+        +DEBUG: bool = False
+        +LOG_LEVEL: str = "WARNING"
+    }
+    
+    class TestingConfig {
+        +TESTING: bool = True
+        +DATA_PATH: str
+    }
+    
+    Config <|-- DevelopmentConfig
+    Config <|-- ProductionConfig
+    Config <|-- TestingConfig
+}
+
+' ============================================================================
+' CAPA DE APLICACIÓN (FACTORY PATTERN)
+' ============================================================================
+package "Capa de Aplicación" {
+    class FlaskApp {
+        +create_app(config_name: str): Flask
+        +init_extensions(app: Flask): void
+        +setup_logging(app: Flask): void
+        +register_blueprints(app: Flask): void
+        +register_error_handlers(app: Flask): void
+    }
+}
+
+' ============================================================================
+' CAPA DE RUTAS (BLUEPRINT PATTERN)
+' ============================================================================
+package "Capa de Rutas" <<Blueprint>> {
+    class MainBlueprint {
+        +index(): Response
+        +registro(): Response
+        +login(): Response
+        +dashboard(): Response
+        +ejercicio(nivel: int): Response
+        +terapia_ocupacional(): Response
+        +logout(): Response
+    }
+    
+    class AuthBlueprint {
+        +registrar_paciente(): JSON
+        +iniciar_sesion(): JSON
+        +cerrar_sesion(): JSON
+        +obtener_paciente_actual(): JSON
+        +verificar_sesion(): JSON
+    }
+    
+    class EjercicioBlueprint {
+        +obtener_ejercicios(): JSON
+        +obtener_ejercicios_rehabilitacion(): JSON
+        +obtener_ejercicios_terapia_ocupacional(): JSON
+        +obtener_ejercicio_por_id(ejercicio_id: str): JSON
+        +registrar_resultado(): JSON
+        +obtener_historial(): JSON
+        +obtener_estadisticas_ejercicio(ejercicio_id: str): JSON
+        +obtener_recomendacion(): JSON
+    }
+}
+
+' ============================================================================
+' CAPA DE CONTROLADORES (MVC - CONTROLLER)
+' ============================================================================
+package "Capa de Controladores" <<Controller>> {
+    class AuthController {
+        -paciente_service: PacienteService
+        +registrar_paciente(): Dict[str, Any]
+        +iniciar_sesion(): Dict[str, Any]
+        +cerrar_sesion(): Dict[str, Any]
+        +obtener_paciente_actual(): Dict[str, Any]
+        +verificar_sesion(): Dict[str, Any]
+    }
+    
+    class EjercicioController {
+        -ejercicio_service: EjercicioService
+        -paciente_service: PacienteService
+        +obtener_ejercicios(): Dict[str, Any]
+        +obtener_ejercicios_rehabilitacion(): Dict[str, Any]
+        +obtener_ejercicios_terapia_ocupacional(): Dict[str, Any]
+        +obtener_ejercicio_por_id(ejercicio_id: str): Dict[str, Any]
+        +registrar_resultado(): Dict[str, Any]
+        +obtener_historial(): Dict[str, Any]
+        +obtener_estadisticas_ejercicio(ejercicio_id: str): Dict[str, Any]
+        +obtener_recomendacion(): Dict[str, Any]
+    }
+}
+
+' ============================================================================
+' CAPA DE SERVICIOS (SERVICE LAYER PATTERN)
+' ============================================================================
+package "Capa de Servicios" <<Service>> {
+    class PacienteService {
+        -paciente_repo: PacienteRepository
+        -ejercicio_repo: EjercicioRepository
+        +registrar_paciente(nombre: str, email: str, password: str, edad: str): Tuple[bool, str, Optional[Paciente]]
+        +autenticar_paciente(email: str, password: str): Tuple[bool, str, Optional[Paciente]]
+        +obtener_paciente(paciente_id: str): Optional[Paciente]
+        +obtener_todos_pacientes(): List[Paciente]
+        +obtener_estadisticas_paciente(paciente_id: str): Dict
+        +obtener_historial_completo(paciente_id: str): List[ResultadoEjercicio]
+        -_validar_email(email: str): bool
+    }
+    
+    class EjercicioService {
+        -ejercicio_repo: EjercicioRepository
+        -_ejercicios_disponibles: List[Ejercicio]
+        +obtener_ejercicios_por_tipo(tipo: TipoEjercicio): List[Ejercicio]
+        +obtener_ejercicios_por_nivel(nivel: NivelDificultad): List[Ejercicio]
+        +obtener_ejercicio_por_id(ejercicio_id: str): Optional[Ejercicio]
+        +obtener_todos_ejercicios(): List[Ejercicio]
+        +obtener_ejercicios_rehabilitacion(): List[Ejercicio]
+        +obtener_ejercicios_terapia_ocupacional(): List[Ejercicio]
+        +registrar_resultado(paciente: Paciente, ejercicio_id: str, exito: bool, ...): ResultadoEjercicio
+        +obtener_estadisticas_ejercicio(paciente_id: str, ejercicio_id: str): Dict
+        +obtener_recomendacion_ejercicio(paciente_id: str): Optional[Ejercicio]
+        -_inicializar_ejercicios(): List[Ejercicio]
+    }
+}
+
+' ============================================================================
+' CAPA DE MODELOS (MVC - MODEL)
+' ============================================================================
+package "Capa de Modelos" <<Model>> {
+    class Paciente {
+        +nombre: str
+        +email: str
+        +password: str
+        +edad: str
+        +id: str
+        +fecha_registro: str
+        +to_dict(): Dict
+        +from_dict(data: Dict): Paciente
+        +to_dict_safe(): Dict
+    }
+    
+    class Ejercicio {
+        +id: str
+        +nombre: str
+        +descripcion: str
+        +tipo: TipoEjercicio
+        +nivel: NivelDificultad
+        +instrucciones: List[str]
+        +parametros: Dict
+        +activo: bool
+        +to_dict(): Dict
+        +from_dict(data: Dict): Ejercicio
+    }
+    
+    class ResultadoEjercicio {
+        +paciente_id: str
+        +tipo_ejercicio: str
+        +nivel: int
+        +exito: bool
+        +fecha: str
+        +tiempo_ejecucion: Optional[float]
+        +puntuacion: Optional[int]
+        +observaciones: Optional[str]
+        +to_dict(): Dict
+        +from_dict(data: Dict): ResultadoEjercicio
+    }
+    
+    enum TipoEjercicio {
+        REHABILITACION
+        TERAPIA_OCUPACIONAL
+    }
+    
+    enum NivelDificultad {
+        PRINCIPIANTE
+        INTERMEDIO
+        AVANZADO
+    }
+    
+    Ejercicio --> TipoEjercicio
+    Ejercicio --> NivelDificultad
+    ResultadoEjercicio --> Paciente : "asociado a"
+}
+
+' ============================================================================
+' CAPA DE REPOSITORIOS (REPOSITORY PATTERN)
+' ============================================================================
+package "Capa de Repositorios" <<Repository>> {
+    class PacienteRepository {
+        -data_path: str
+        -pacientes_file: str
+        -historial_path: str
+        +get_all(): List[Paciente]
+        +save_all(pacientes: List[Paciente]): void
+        +add(paciente: Paciente): bool
+        +find_by_email(email: str): Optional[Paciente]
+        +find_by_credentials(email: str, password: str): Optional[Paciente]
+        +get_historial_path(paciente: Paciente): str
+        -_ensure_directories(): void
+    }
+    
+    class EjercicioRepository {
+        -historial_path: str
+        +registrar_resultado(paciente_id: str, ejercicio: str, exito: bool, ...): ResultadoEjercicio
+        +obtener_historial(paciente_id: str): List[ResultadoEjercicio]
+        +obtener_estadisticas(paciente_id: str): Dict
+    }
+}
+
+' ============================================================================
+' CAPA DE BASE DE DATOS (MYSQL)
+' ============================================================================
+package "Capa de Base de Datos" <<Database>> {
+    class MySQLConnectionManager {
+        -config: Dict
+        -connection_pool: MySQLConnectionPool
+        +get_connection(): Connection
+        -_create_connection_pool(): void
+    }
+    
+    class MySQLDatabaseManager {
+        -connection_manager: MySQLConnectionManager
+        +_ensure_database_exists(): void
+        +_create_tables(): void
+        +_hash_password(password: str): str
+        +_generate_uuid(): str
+    }
+    
+    class PacienteManager {
+        +crear_paciente(nombre: str, email: str, password: str, edad: int, notas: str): Dict
+        +autenticar_paciente(email: str, password: str): Optional[Dict]
+        +obtener_paciente_por_id(paciente_id: int): Optional[Dict]
+        +obtener_todos_pacientes(): List[Dict]
+        +verificar_email_existe(email: str): bool
+    }
+    
+    class HistorialManager {
+        +registrar_ejercicio(paciente_id: int, nivel_ejercicio: str, exito: bool, ...): Dict
+        +obtener_historial_paciente(paciente_id: int, limit: int): List[Dict]
+    }
+    
+    class SesionTerapiaManager {
+        +crear_sesion(paciente_id: int, duracion_minutos: int, tipo_terapia: str, observaciones: str): Dict
+        +obtener_sesiones_paciente(paciente_id: int, limit: int): List[Dict]
+    }
+    
+    class MySQLDatabaseService {
+        +pacientes: PacienteManager
+        +historial: HistorialManager
+        +sesiones: SesionTerapiaManager
+        +test_connection(): bool
+        +get_database_info(): Dict
+    }
+    
+    MySQLDatabaseManager <|-- PacienteManager
+    MySQLDatabaseManager <|-- HistorialManager
+    MySQLDatabaseManager <|-- SesionTerapiaManager
+    MySQLDatabaseManager --> MySQLConnectionManager : "usa"
+}
+
+' ============================================================================
+' RELACIONES ENTRE CAPAS
+' ============================================================================
+FlaskApp --> Config : "usa configuración"
+FlaskApp --> MainBlueprint : "registra"
+FlaskApp --> AuthBlueprint : "registra"
+FlaskApp --> EjercicioBlueprint : "registra"
+
+MainBlueprint --> AuthController : "delega a"
+AuthBlueprint --> AuthController : "delega a"
+EjercicioBlueprint --> EjercicioController : "delega a"
+
+AuthController --> PacienteService : "usa"
+EjercicioController --> EjercicioService : "usa"
+EjercicioController --> PacienteService : "usa"
+
+PacienteService --> PacienteRepository : "usa"
+PacienteService --> EjercicioRepository : "usa"
+EjercicioService --> EjercicioRepository : "usa"
+
+PacienteRepository --> Paciente : "gestiona"
+EjercicioRepository --> ResultadoEjercicio : "gestiona"
+EjercicioRepository --> Ejercicio : "referencia"
+
+PacienteManager --> MySQLConnectionManager : "usa"
+HistorialManager --> MySQLConnectionManager : "usa"
+SesionTerapiaManager --> MySQLConnectionManager : "usa"
+
+' ============================================================================
+' NOTAS EXPLICATIVAS
+' ============================================================================
+note right of FlaskApp
+  **Factory Pattern**
+  Crea y configura
+  la aplicación Flask
+  según el entorno
+end note
+
+note right of PacienteService
+  **Service Layer Pattern**
+  Contiene la lógica
+  de negocio
+  centralizada
+end note
+
+note right of PacienteRepository
+  **Repository Pattern**
+  Abstrae el acceso
+  a datos, permite
+  cambiar la fuente
+  sin afectar servicios
+end note
+
+note right of MySQLDatabaseManager
+  **Database Layer**
+  Gestiona conexiones
+  y operaciones con
+  MySQL usando pool
+  de conexiones
+end note
+
+@enduml
+
+
+
+
+
+

@@ -1,0 +1,124 @@
+@startuml DiagramaFlujoOperacionRehaVR
+!theme plain
+skinparam activity {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #0D47A1
+}
+skinparam startEnd {
+    BackgroundColor #4CAF50
+    BorderColor #2E7D32
+    FontColor #FFFFFF
+}
+skinparam decision {
+    BackgroundColor #FFC107
+    BorderColor #F57C00
+    FontColor #E65100
+}
+
+title Diagrama de Flujo de Operación del Prototipo\nSistema RehaVR - Rehabilitación Motora
+
+start
+
+:Usuario accede al sistema;
+note right: http://localhost:3000
+
+if (¿Usuario autenticado?) then (No)
+    :Mostrar página de inicio;
+    :Opciones: Registro o Login;
+    
+    if (¿Registro?) then (Sí)
+        :Mostrar formulario de registro;
+        :Usuario ingresa:\n- Nombre\n- Email\n- Contraseña\n- Edad;
+        :Validar datos en frontend;
+        
+        if (¿Datos válidos?) then (Sí)
+            :Enviar POST /api/auth/registro;
+            :Backend valida y crea paciente;
+            :Guardar en MySQL;
+            :Crear sesión;
+            :Redirigir a Dashboard;
+        else (No)
+            :Mostrar error de validación;
+            :Permitir corregir datos;
+        endif
+    else (Login)
+        :Mostrar formulario de login;
+        :Usuario ingresa:\n- Email\n- Contraseña;
+        :Enviar POST /api/auth/login;
+        :Backend autentica;
+        
+        if (¿Credenciales válidas?) then (Sí)
+            :Crear sesión;
+            :Redirigir a Dashboard;
+        else (No)
+            :Mostrar error de autenticación;
+            :Permitir reintentar;
+        endif
+    endif
+else (Sí)
+    :Redirigir a Dashboard;
+endif
+
+:Mostrar Dashboard;
+note right: Lista de ejercicios disponibles
+
+:Usuario selecciona ejercicio;
+note right: Nivel 1, 2, 3 o Terapia Ocupacional
+
+:Mostrar página del ejercicio;
+:Mostrar instrucciones;
+:Inicializar canvas del juego;
+
+:Usuario presiona ESPACIO;
+:Iniciar juego;
+
+repeat
+    :Renderizar canvas;
+    :Detectar entrada del usuario;
+    note right: Teclado (flechas/WASD)\no Mouse
+    
+    if (¿Usuario mueve mano?) then (Sí)
+        :Actualizar posición mano;
+    endif
+    
+    if (¿Nivel > 1?) then (Sí)
+        :Mover objetivo;
+        :Verificar rebotes;
+    endif
+    
+    :Dibujar elementos en canvas;
+    note right: Mano azul\nObjetivo rojo
+    
+    if (¿Colisión detectada?) then (Sí)
+        :Incrementar puntuación;
+        :Incrementar aciertos;
+        :Reposicionar objetivo;
+    endif
+    
+    :Actualizar timer;
+    
+    if (¿Tiempo agotado?) then (No)
+    else (Sí)
+        :Finalizar juego;
+    endif
+repeat while (¿Juego activo?) is (Sí)
+
+:Calcular resultados;
+note right: Puntuación\nAciertos\nTiempo ejecución
+
+:Enviar POST /api/ejercicios/resultado;
+:Backend guarda resultado en MySQL;
+:Mostrar pantalla de finalización;
+
+if (¿Usuario quiere otro ejercicio?) then (Sí)
+    :Volver a Dashboard;
+else (No)
+    :Cerrar sesión;
+    :Redirigir a página principal;
+endif
+
+stop
+
+@enduml
+
