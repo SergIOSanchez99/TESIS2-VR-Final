@@ -65,7 +65,12 @@ RehaVR/
 
 ## 📦 Instalación y Ejecución
 
-### Opción 1: Desarrollo Local
+### Opción 1: Ejecución Automática (Recomendada)
+```bash
+python start_project.py
+```
+
+### Opción 2: Ejecución Manual
 
 #### Backend
 ```bash
@@ -81,10 +86,12 @@ npm install
 npm run dev
 ```
 
-### Opción 2: Docker Compose
+### Opción 3: Docker Compose
 ```bash
 docker-compose up --build
 ```
+
+**📖 Para más detalles, consulta:** [EJECUTAR_PROYECTO.md](./EJECUTAR_PROYECTO.md)
 
 ## 🔧 Configuración
 
@@ -163,20 +170,11 @@ npm run lint
 npm run build
 ```
 
-## 📚 API Documentation
+## 📚 Documentación
 
-### Endpoints de Autenticación
-- `POST /api/auth/registro` - Registrar paciente
-- `POST /api/auth/login` - Iniciar sesión
-- `POST /api/auth/logout` - Cerrar sesión
-- `GET /api/auth/paciente` - Obtener paciente actual
-
-### Endpoints de Ejercicios
-- `GET /api/ejercicios/` - Obtener todos los ejercicios
-- `GET /api/ejercicios/rehabilitacion` - Ejercicios de rehabilitación
-- `GET /api/ejercicios/terapia-ocupacional` - Terapia ocupacional
-- `POST /api/ejercicios/resultado` - Registrar resultado
-- `GET /api/ejercicios/historial` - Obtener historial
+- **[Guía de Despliegue](./GUIA_DEPLOY.md)** - Guía completa con pasos para capturas (Scrum)
+- **[Arquitectura](./ARQUITECTURA.md)** - Arquitectura del sistema
+- **[Diagramas UML](./INSTRUCCIONES_DIAGRAMAS_UML.md)** - Instrucciones para generar diagramas
 
 ## 🔒 Seguridad
 

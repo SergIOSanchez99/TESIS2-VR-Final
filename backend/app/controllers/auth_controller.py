@@ -153,3 +153,20 @@ class AuthController:
                 
         except Exception as e:
             return jsonify({'error': f'Error interno del servidor: {str(e)}'}), 500
+    
+    def obtener_todos_pacientes(self) -> Dict[str, Any]:
+        """
+        Obtiene la lista de todos los pacientes registrados
+        
+        Returns:
+            Dict con respuesta JSON
+        """
+        try:
+            pacientes = self.paciente_service.obtener_todos_pacientes()
+            return jsonify({
+                'success': True,
+                'total': len(pacientes),
+                'pacientes': [p.to_dict_safe() for p in pacientes]
+            }), 200
+        except Exception as e:
+            return jsonify({'error': f'Error interno del servidor: {str(e)}'}), 500

@@ -65,8 +65,19 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Flask session
-flask_session/
+# Flask session (mantener directorio pero no archivos)
+backend/flask_session/*
+!backend/flask_session/.gitkeep
+
+# Python cache
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Backend data (no versionar sesiones)
+backend/flask_session/*
+!backend/flask_session/.gitkeep
 
 # Temporary files
 *.tmp

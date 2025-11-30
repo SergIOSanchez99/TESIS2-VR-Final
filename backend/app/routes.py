@@ -120,6 +120,12 @@ def verificar_sesion():
     return auth_controller.verificar_sesion()
 
 
+@auth_bp.route('/pacientes', methods=['GET'])
+def obtener_todos_pacientes():
+    """API para obtener lista de todos los pacientes"""
+    return auth_controller.obtener_todos_pacientes()
+
+
 # ============================================================================
 # RUTAS DE EJERCICIOS (API)
 # ============================================================================
