@@ -9,132 +9,229 @@ RehaVR/
 ├── backend/                    # Backend API (Flask)
 │   ├── app/
 │   │   ├── controllers/       # Controladores MVC
+│   │   │   ├── auth_controller.py
+│   │   │   └── ejercicio_controller.py
 │   │   ├── models/           # Modelos de datos
+│   │   │   ├── ejercicio.py
+│   │   │   └── paciente.py
 │   │   ├── services/         # Lógica de negocio
+│   │   │   ├── ejercicio_service.py
+│   │   │   └── paciente_service.py
+│   │   ├── database/         # Gestión de base de datos
+│   │   │   └── mysql_manager.py
 │   │   ├── utils/            # Utilidades
-│   │   └── routes.py         # Definición de rutas
+│   │   └── routes.py         # Definición de rutas y blueprints
 │   ├── config/               # Configuración
-│   ├── tests/                # Pruebas unitarias
-│   └── run.py               # Entry point
-├── frontend/                  # Frontend (React + Vite)
+│   │   └── settings.py
+│   ├── data/                 # Datos locales del backend
+│   │   └── pacientes/
+│   ├── requirements.txt      # Dependencias Python
+│   └── run.py               # Entry point del backend
+├── frontend/                  # Frontend (Flask Templates + React)
 │   ├── src/
-│   │   ├── components/       # Componentes React
-│   │   ├── pages/           # Páginas
-│   │   ├── utils/           # Utilidades
-│   │   └── assets/          # Recursos estáticos
-│   ├── public/              # Archivos públicos
-│   └── package.json         # Dependencias
+│   │   ├── templates/       # Templates Jinja2 (servidos por Flask)
+│   │   │   ├── base.html
+│   │   │   ├── index.html
+│   │   │   ├── login.html
+│   │   │   ├── registro.html
+│   │   │   ├── dashboard.html
+│   │   │   ├── ejercicio.html
+│   │   │   └── terapia_ocupacional.html
+│   │   ├── components/      # Componentes React (opcionales)
+│   │   │   ├── EjercicioCanvas.jsx
+│   │   │   └── Layout.jsx
+│   │   ├── pages/          # Páginas React (opcionales)
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Ejercicio.jsx
+│   │   │   ├── Home.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── Register.jsx
+│   │   │   └── TerapiaOcupacional.jsx
+│   │   └── assets/         # Recursos estáticos
+│   │       └── static/
+│   │           ├── css/
+│   │           └── js/
+│   ├── vite.config.js      # Configuración de Vite
+│   ├── package.json        # Dependencias Node.js
+│   └── index.html          # Entry point React (opcional)
+├── modules/                  # Módulos legacy
+│   └── ejercicios.py       # Implementación Pygame (legacy)
 ├── data/                     # Datos del sistema
-└── docker-compose.yml       # Orquestación
+│   ├── pacientes/          # Datos de pacientes
+│   │   ├── pacientes.json
+│   │   └── historial/
+│   └── sessions/           # Sesiones de Flask
+│       └── .gitkeep
+├── venv/                     # Entorno virtual Python
+├── logs/                     # Logs de la aplicación
+├── run_backend.py           # Script de ejecución del backend
+├── start_project.py         # Script de inicio automático
+├── docker-compose.yml       # Orquestación Docker
+└── .gitignore              # Archivos ignorados por Git
 ```
 
 ## 🎯 Patrones Arquitectónicos Implementados
 
 ### Backend (Flask)
-- **Factory Pattern**: Creación de aplicación Flask
+- **Factory Pattern**: Creación de aplicación Flask (`create_app()`)
 - **MVC Pattern**: Separación de Modelos, Vistas y Controladores
-- **Repository Pattern**: Acceso a datos
-- **Service Layer Pattern**: Lógica de negocio
-- **Blueprint Pattern**: Organización de rutas
-- **Configuration Pattern**: Gestión de configuraciones
+- **Repository Pattern**: Acceso a datos mediante repositorios
+- **Service Layer Pattern**: Lógica de negocio en servicios
+- **Blueprint Pattern**: Organización de rutas en blueprints
+- **Configuration Pattern**: Gestión de configuraciones por entorno
 
-### Frontend (React)
-- **Component Pattern**: Componentes reutilizables
-- **Hooks Pattern**: Gestión de estado
-- **Container/Presentational Pattern**: Separación de lógica y presentación
-- **Custom Hooks Pattern**: Lógica reutilizable
+### Frontend
+- **Template Pattern**: Templates Jinja2 servidos por Flask
+- **Component Pattern**: Componentes React reutilizables (opcionales)
+- **Static Assets Pattern**: Recursos estáticos organizados
 
 ## 🚀 Tecnologías Utilizadas
 
 ### Backend
 - **Python 3.8+**: Lenguaje principal
-- **Flask 2.3**: Framework web
+- **Flask 2.3+**: Framework web
 - **Flask-CORS**: Manejo de CORS
-- **Flask-Session**: Gestión de sesiones
-- **Marshmallow**: Serialización y validación
-- **Pytest**: Testing
+- **Flask-Session**: Gestión de sesiones (almacenadas en `data/sessions/`)
+- **Marshmallow**: Serialización y validación de datos
+- **mysql-connector-python**: Conexión a MySQL
+- **python-dotenv**: Gestión de variables de entorno
+- **Pytest**: Testing automatizado
+- **Black**: Formateo de código Python
+- **Flake8**: Linting de código Python
 
 ### Frontend
-- **React 18**: Framework de UI
-- **Vite**: Build tool
-- **React Router**: Navegación
-- **Axios**: Cliente HTTP
-- **Chart.js**: Gráficos
+- **Jinja2**: Motor de templates (servido por Flask)
 - **Bootstrap 5**: Framework CSS
-- **Framer Motion**: Animaciones
+- **JavaScript (Vanilla)**: Lógica del frontend
+- **HTML5 Canvas**: Renderizado de juegos de rehabilitación
+- **React 18** (opcional): Componentes React para futuras mejoras
+- **Vite**: Build tool para desarrollo React
+- **Chart.js**: Gráficos y visualizaciones
+- **Axios**: Cliente HTTP para llamadas API
+
+### Módulos Legacy
+- **Pygame**: Implementación legacy de ejercicios (`modules/ejercicios.py`)
 
 ## 📦 Instalación y Ejecución
 
+### Requisitos Previos
+- Python 3.8 o superior
+- Node.js 16+ y npm (opcional, para desarrollo React)
+- MySQL (opcional, para base de datos)
+
 ### Opción 1: Ejecución Automática (Recomendada)
+
+El script `start_project.py` automatiza todo el proceso:
+
 ```bash
-python start_project.py
+# Windows
+py start_project.py
+
+# Linux/Mac
+python3 start_project.py
 ```
 
-### Opción 2: Ejecución Manual
+Este script:
+- ✅ Detecta/crea el entorno virtual (`venv/`)
+- ✅ Instala dependencias del backend automáticamente
+- ✅ Configura variables de entorno
+- ✅ Inicia el servidor Flask en `http://localhost:5000`
 
-#### Backend
+### Opción 2: Ejecución Manual del Backend
+
 ```bash
+# Usar el script de ejecución (recomendado)
+py run_backend.py
+
+# O ejecutar directamente
 cd backend
-pip install -r requirements.txt
-python run.py
+py run.py
 ```
 
-#### Frontend
+El backend se ejecutará en `http://localhost:5000` y servirá:
+- Templates HTML desde `frontend/src/templates/`
+- Archivos estáticos desde `frontend/src/assets/static/`
+- API REST en `/api/auth/` y `/api/ejercicios/`
+
+### Opción 3: Desarrollo con React (Opcional)
+
+Si quieres usar los componentes React:
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### Opción 3: Docker Compose
+Esto iniciará Vite en `http://localhost:5000` (proxy a backend en puerto 5001).
+
+### Opción 4: Docker Compose
+
 ```bash
 docker-compose up --build
 ```
-
-**📖 Para más detalles, consulta:** [EJECUTAR_PROYECTO.md](./EJECUTAR_PROYECTO.md)
 
 ## 🔧 Configuración
 
 ### Variables de Entorno
 
+El proyecto usa variables de entorno con valores por defecto. Puedes crear un archivo `.env` en la raíz:
+
 #### Backend (.env)
 ```env
 FLASK_ENV=development
 FLASK_DEBUG=True
-SECRET_KEY=tu_clave_secreta
+FLASK_HOST=0.0.0.0
+FLASK_PORT=5000
+SECRET_KEY=tu_clave_secreta_aqui
 DATA_PATH=data/pacientes
+HISTORIAL_PATH=data/pacientes/historial
+
+# MySQL (opcional)
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=tu_password
+MYSQL_DATABASE=rehabilitacion_virtual
 ```
 
-#### Frontend (.env)
-```env
-REACT_APP_API_URL=http://localhost:5000
-```
+### Estructura de Datos
+
+Los datos se almacenan en:
+- `data/pacientes/pacientes.json`: Información de pacientes
+- `data/pacientes/historial/`: Historial de ejercicios por paciente
+- `data/sessions/`: Sesiones de Flask (generadas automáticamente)
 
 ## 📊 Características
 
 ### 🔐 Autenticación y Autorización
-- Registro de pacientes
-- Inicio de sesión seguro
-- Gestión de sesiones
-- Protección de rutas
+- Registro de pacientes con validación
+- Inicio de sesión seguro con sesiones Flask
+- Gestión de sesiones en `data/sessions/`
+- Protección de rutas con decoradores
 
-### 🎮 Ejercicios de Rehabilitación
-- **Nivel 1**: Objetivo estático
-- **Nivel 2**: Objetivo en movimiento lento
-- **Nivel 3**: Objetivo en movimiento rápido
-- **Terapia Ocupacional**: Ejercicios específicos
+### 🎮 Ejercicios de Rehabilitación Motora
+- **Nivel 1**: Objetivo estático - Ejercicio básico de precisión
+- **Nivel 2**: Objetivo en movimiento lento - Mejora de coordinación
+- **Nivel 3**: Objetivo en movimiento rápido - Desafío avanzado
+- **Métricas avanzadas**: Precisión, velocidad promedio, rango de movimiento, tiempo de reacción, consistencia, combo máximo
+
+### 🏥 Terapia Ocupacional
+- Ejercicios funcionales específicos
+- Actividades de la vida diaria
+- Seguimiento de progreso personalizado
 
 ### 📈 Seguimiento y Análisis
-- Historial personalizado
-- Estadísticas en tiempo real
-- Gráficos de progreso
-- Recomendaciones inteligentes
+- Historial personalizado por paciente
+- Estadísticas en tiempo real durante ejercicios
+- Métricas médicas avanzadas
+- Almacenamiento en JSON estructurado
 
 ### 🎨 Interfaz Moderna
-- Diseño responsive
-- Animaciones fluidas
-- UX optimizada
-- Accesibilidad
+- Diseño responsive con Bootstrap 5
+- Animaciones fluidas en los juegos
+- UX optimizada para pacientes
+- Accesibilidad mejorada
 
 ## 🛠️ Desarrollo
 
@@ -142,12 +239,19 @@ REACT_APP_API_URL=http://localhost:5000
 - **Type Hints**: Tipado estático en Python
 - **ESLint/Prettier**: Formateo de código JavaScript
 - **Black**: Formateo de código Python
+- **Flake8**: Linting de código Python
 - **Pytest**: Testing automatizado
 
 ### Comandos de Desarrollo
 
 #### Backend
 ```bash
+# Activar entorno virtual
+# Windows
+venv\Scripts\activate
+# Linux/Mac
+source venv/bin/activate
+
 # Formatear código
 black backend/
 
@@ -160,53 +264,64 @@ flake8 backend/
 
 #### Frontend
 ```bash
+cd frontend
+
 # Formatear código
 npm run format
 
 # Linting
 npm run lint
 
-# Build de producción
+# Build de producción (React)
 npm run build
 ```
+
+### Estructura de Archivos Importantes
+
+- `backend/app/__init__.py`: Factory de la aplicación Flask
+- `backend/app/routes.py`: Definición de rutas y blueprints
+- `backend/config/settings.py`: Configuración por entorno
+- `frontend/src/templates/`: Templates Jinja2 servidos por Flask
+- `frontend/src/assets/static/js/main.js`: JavaScript principal
+- `run_backend.py`: Script de ejecución con manejo de venv
+- `start_project.py`: Script de inicio completo
 
 ## 📚 Documentación
 
 - **[Guía de Despliegue](./GUIA_DEPLOY.md)** - Guía completa con pasos para capturas (Scrum)
-- **[Arquitectura](./ARQUITECTURA.md)** - Arquitectura del sistema
-- **[Diagramas UML](./INSTRUCCIONES_DIAGRAMAS_UML.md)** - Instrucciones para generar diagramas
 
 ## 🔒 Seguridad
 
 - Validación de datos en frontend y backend
 - Sanitización de inputs
-- Protección CSRF
-- Headers de seguridad
-- Logging de auditoría
+- Gestión segura de sesiones
+- Headers de seguridad configurados
+- Logging de auditoría en `logs/`
 
 ## 📈 Monitoreo y Logging
 
-- Logs estructurados
-- Métricas de rendimiento
+- Logs estructurados en `logs/rehavr.log`
+- Rotación automática de logs
 - Manejo de errores centralizado
-- Health checks
+- Health checks disponibles
 
 ## 🚀 Despliegue
 
 ### Producción
+
 ```bash
-# Backend
+# Backend con Gunicorn
 export FLASK_ENV=production
 gunicorn -w 4 -b 0.0.0.0:5000 backend.run:app
 
-# Frontend
-npm run build
-serve -s dist -l 3000
+# O usando el script
+FLASK_ENV=production py run_backend.py
 ```
 
 ### Docker
+
 ```bash
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose up -d
 ```
 
 ## 🤝 Contribución
@@ -230,7 +345,7 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 ## 📞 Contacto
 
 - **Email**: [tu-email@ejemplo.com]
-- **Proyecto**: [https://github.com/tu-usuario/rehavr]
+- **Proyecto**: [https://github.com/SergIOSanchez99/TESIS2-VR-Final]
 
 ---
 
