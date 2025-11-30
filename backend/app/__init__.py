@@ -60,6 +60,11 @@ def init_extensions(app):
     cors_config = get_cors_config()
     CORS(app, **cors_config)
     
+    # Crear directorio de sesiones si no existe
+    session_dir = app.config.get('SESSION_FILE_DIR')
+    if session_dir and not os.path.exists(session_dir):
+        os.makedirs(session_dir, exist_ok=True)
+    
     # Configurar sesiones
     Session(app)
 

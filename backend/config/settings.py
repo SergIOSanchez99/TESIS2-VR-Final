@@ -31,6 +31,7 @@ class Config:
     
     # Configuración de sesiones
     SESSION_TYPE = 'filesystem'
+    SESSION_FILE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data', 'sessions')
     PERMANENT_SESSION_LIFETIME = 3600  # 1 hora
     
     # Configuración de logging

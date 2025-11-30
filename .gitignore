@@ -66,8 +66,8 @@ yarn-error.log*
 Thumbs.db
 
 # Flask session (mantener directorio pero no archivos)
-backend/flask_session/*
-!backend/flask_session/.gitkeep
+data/sessions/*
+!data/sessions/.gitkeep
 
 # Python cache
 **/__pycache__/
@@ -75,9 +75,15 @@ backend/flask_session/*
 *.pyo
 *.pyd
 
-# Backend data (no versionar sesiones)
-backend/flask_session/*
-!backend/flask_session/.gitkeep
+# Paquetes Python instalados localmente (no deberían estar aquí)
+**/markupsafe/
+**/msgspec/
+**/flask/
+**/blinker/
+**/click/
+**/itsdangerous/
+**/jinja2/
+**/werkzeug/
 
 # Temporary files
 *.tmp
