@@ -17,6 +17,14 @@ def check_python_version():
         sys.exit(1)
     print(f"✅ Python {sys.version.split()[0]} detectado")
 
+def get_python_executable():
+    """Obtiene el ejecutable de Python del entorno virtual o del sistema"""
+    # Usar ruta absoluta para que funcione desde cualquier directorio
+    venv_python = Path(__file__).parent / "venv" / "Scripts" / "python.exe"
+    if venv_python.exists():
+        return str(venv_python.resolve())
+    return sys.executable
+
 def install_dependencies():
     """Instala las dependencias del backend"""
     backend_path = Path("backend")
@@ -26,14 +34,23 @@ def install_dependencies():
         print("❌ Error: No se encontró requirements.txt en el directorio backend")
         sys.exit(1)
     
+    python_exe = get_python_executable()
+    
     print("📦 Instalando dependencias del backend...")
     try:
-        subprocess.run([
-            sys.executable, "-m", "pip", "install", "-r", str(requirements_file)
-        ], check=True)
+        result = subprocess.run([
+            python_exe, "-m", "pip", "install", "-r", str(requirements_file)
+        ], capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            print(f"❌ Error al instalar dependencias:")
+            print(result.stderr)
+            sys.exit(1)
+        
         print("✅ Dependencias instaladas correctamente")
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         print(f"❌ Error al instalar dependencias: {e}")
+        print("💡 Intenta instalar manualmente con: .\\venv\\Scripts\\python.exe -m pip install -r backend/requirements.txt")
         sys.exit(1)
 
 def setup_environment():
@@ -42,7 +59,8 @@ def setup_environment():
         'FLASK_ENV': 'development',
         'FLASK_DEBUG': 'True',
         'SECRET_KEY': 'rehavr_secret_key_2024',
-        'DATA_PATH': 'data/pacientes'
+        'DATA_PATH': 'data/pacientes',
+        'FLASK_PORT': '5000'  # Puerto 5000 por defecto
     }
     
     for key, value in env_vars.items():
@@ -76,6 +94,11 @@ def run_backend():
         print("❌ Error: No se encontró run.py en el directorio backend")
         sys.exit(1)
     
+    python_exe = get_python_executable()
+    
+    # Resolver ruta absoluta del archivo run.py
+    run_file_abs = run_file.resolve()
+    
     print("🚀 Iniciando RehaVR Backend...")
     print("📍 Servidor: http://localhost:5000")
     print("🔧 Modo: Desarrollo")
@@ -83,14 +106,23 @@ def run_backend():
     
     try:
         # Cambiar al directorio backend
+        original_dir = os.getcwd()
         os.chdir(backend_path)
         
-        # Ejecutar el backend
-        subprocess.run([sys.executable, "run.py"])
+        try:
+            # Ejecutar el backend usando la ruta absoluta del ejecutable
+            subprocess.run([python_exe, str(run_file_abs)])
+        finally:
+            # Restaurar el directorio original
+            os.chdir(original_dir)
     except KeyboardInterrupt:
         print("\n🛑 Servidor detenido por el usuario")
+        os.chdir(original_dir)
     except Exception as e:
         print(f"❌ Error al ejecutar el backend: {e}")
+        print(f"   Python ejecutable: {python_exe}")
+        print(f"   Archivo run.py: {run_file_abs}")
+        os.chdir(original_dir)
         sys.exit(1)
 
 def main():

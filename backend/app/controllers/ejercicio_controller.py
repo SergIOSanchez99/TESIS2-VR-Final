@@ -103,11 +103,23 @@ class EjercicioController:
             if not data:
                 return jsonify({'error': 'Datos requeridos'}), 400
             
-            ejercicio_id = data.get('ejercicio_id')
+            ejercicio_id = data.get('ejercicio_id') or data.get('nivel')
             exito = data.get('exito', False)
-            tiempo_ejecucion = data.get('tiempo_ejecucion')
+            tiempo_ejecucion = data.get('tiempo_ejecucion') or data.get('duracion')
             puntuacion = data.get('puntuacion')
             observaciones = data.get('observaciones')
+            nivel = data.get('nivel')
+            
+            # Métricas médicas avanzadas
+            precision = data.get('precision')
+            velocidad_promedio = data.get('velocidad_promedio')
+            rango_movimiento = data.get('rango_movimiento')
+            tiempo_reaccion_promedio = data.get('tiempo_reaccion_promedio')
+            tasa_aciertos = data.get('tasa_aciertos')
+            consistencia = data.get('consistencia')
+            combo_maximo = data.get('combo_maximo')
+            aciertos = data.get('aciertos')
+            fallos = data.get('fallos')
             
             if not ejercicio_id:
                 return jsonify({'error': 'ID de ejercicio requerido'}), 400
@@ -116,9 +128,19 @@ class EjercicioController:
             from ..models.paciente import Paciente
             paciente = Paciente.from_dict(paciente_data)
             
-            # Registrar resultado
+            # Registrar resultado con métricas avanzadas
             resultado = self.ejercicio_service.registrar_resultado(
-                paciente, ejercicio_id, exito, tiempo_ejecucion, puntuacion, observaciones
+                paciente, ejercicio_id, exito, tiempo_ejecucion, puntuacion, observaciones,
+                precision=precision,
+                velocidad_promedio=velocidad_promedio,
+                rango_movimiento=rango_movimiento,
+                tiempo_reaccion_promedio=tiempo_reaccion_promedio,
+                tasa_aciertos=tasa_aciertos,
+                consistencia=consistencia,
+                combo_maximo=combo_maximo,
+                aciertos=aciertos,
+                fallos=fallos,
+                nivel=nivel
             )
             
             return jsonify({

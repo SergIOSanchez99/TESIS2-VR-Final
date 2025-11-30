@@ -73,82 +73,490 @@ def menu_ejercicios_grafico(root, paciente, volver_callback):
     boton_volver.pack(pady=6)
 
 def ejecutar_ejercicio(nivel, paciente):
+    """Ejecuta un ejercicio de rehabilitación motora mejorado con pygame"""
+    import time
+    import math
+    
     pygame.init()
-    ancho, alto = 800, 600
+    pygame.mixer.init()
+    
+    # Configuración de pantalla
+    ancho, alto = 1000, 700
     pantalla = pygame.display.set_mode((ancho, alto))
-    pygame.display.set_caption(f"Ejercicio de Rehabilitación - Nivel {nivel}")
+    pygame.display.set_caption(f"Rehabilitación Motora - Nivel {nivel} | Paciente: {paciente.get('nombre', 'Usuario')}")
     reloj = pygame.time.Clock()
-
-    # Colores
+    
+    # Colores mejorados
     BLANCO = (255, 255, 255)
-    AZUL = (0, 0, 255)
-    ROJO = (255, 0, 0)
-    VERDE = (0, 200, 0)
-
-    # Mano virtual
-    mano_size = 50
+    AZUL_PRIMARIO = (25, 118, 210)
+    AZUL_SECUNDARIO = (66, 165, 245)
+    ROJO_PRIMARIO = (244, 67, 54)
+    VERDE_EXITO = (76, 175, 80)
+    VERDE_CLARO = (129, 199, 132)
+    GRIS_FONDO = (245, 247, 250)
+    GRIS_OSCURO = (97, 97, 97)
+    AMARILLO = (255, 193, 7)
+    NARANJA = (255, 152, 0)
+    
+    # Fuentes
+    fuente_titulo = pygame.font.Font(None, 48)
+    fuente_grande = pygame.font.Font(None, 36)
+    fuente_mediana = pygame.font.Font(None, 24)
+    fuente_pequena = pygame.font.Font(None, 18)
+    
+    # Estado del juego
+    tiempo_inicio = time.time()
+    tiempo_limite = 60  # 60 segundos
+    puntuacion = 0
+    aciertos = 0
+    fallos = 0
+    combo = 0
+    max_combo = 0
+    ultimo_acierto_tiempo = 0
+    
+    # Métricas médicas
+    metricas = {
+        'tiempos_reaccion': [],
+        'distancias_movimiento': [],
+        'posiciones_mano': [],
+        'posiciones_objetivo': [],
+        'min_x': float('inf'),
+        'max_x': float('-inf'),
+        'min_y': float('inf'),
+        'max_y': float('-inf')
+    }
+    
+    # Mano virtual mejorada
+    mano_size = 45
     mano_x, mano_y = ancho // 2, alto // 2
-    velocidad = 10
-
-    # Objetivo
-    objetivo_size = 60
-    objetivo_x = random.randint(0, ancho - objetivo_size)
-    objetivo_y = random.randint(0, alto - objetivo_size)
-    objetivo_dx, objetivo_dy = 0, 0
+    velocidad_base = 8
+    velocidad = velocidad_base
+    mano_color = AZUL_PRIMARIO
+    mano_pulso = 0
+    
+    # Objetivo mejorado
+    objetivo_size = nivel == 1 and 50 or nivel == 2 and 45 or 40
+    objetivo_x = random.randint(objetivo_size, ancho - objetivo_size)
+    objetivo_y = random.randint(objetivo_size, alto - objetivo_size)
+    objetivo_vx, objetivo_vy = 0, 0
+    
     if nivel == 2:
-        objetivo_dx = 3
-        objetivo_dy = 2
+        objetivo_vx = random.choice([-2, 2])
+        objetivo_vy = random.choice([-2, 2])
     elif nivel == 3:
-        objetivo_dx = 7
-        objetivo_dy = 5
-
-    tocado = False
-    while True:
+        objetivo_vx = random.choice([-5, 5])
+        objetivo_vy = random.choice([-5, 5])
+    
+    objetivo_color = ROJO_PRIMARIO
+    objetivo_pulso = 0
+    objetivo_brillo = 0
+    
+    # Partículas para efectos visuales
+    particulas = []
+    
+    # Estado del juego
+    juego_activo = True
+    pausado = False
+    objetivo_tocado = False
+    
+    # Bucle principal del juego
+    while juego_activo:
+        tiempo_actual = time.time()
+        tiempo_transcurrido = tiempo_actual - tiempo_inicio
+        tiempo_restante = max(0, tiempo_limite - tiempo_transcurrido)
+        
+        # Manejo de eventos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-        teclas = pygame.key.get_pressed()
-        if teclas[pygame.K_LEFT]:
-            mano_x -= velocidad
-        if teclas[pygame.K_RIGHT]:
-            mano_x += velocidad
-        if teclas[pygame.K_UP]:
-            mano_y -= velocidad
-        if teclas[pygame.K_DOWN]:
-            mano_y += velocidad
-        # Limitar a la pantalla
-        mano_x = max(0, min(ancho - mano_size, mano_x))
-        mano_y = max(0, min(alto - mano_size, mano_y))
-        # Mover objetivo si corresponde
-        if nivel > 1:
-            objetivo_x += objetivo_dx
-            objetivo_y += objetivo_dy
-            if objetivo_x <= 0 or objetivo_x >= ancho - objetivo_size:
-                objetivo_dx *= -1
-            if objetivo_y <= 0 or objetivo_y >= alto - objetivo_size:
-                objetivo_dy *= -1
-        # Detección de colisión
-        mano_rect = pygame.Rect(mano_x, mano_y, mano_size, mano_size)
-        objetivo_rect = pygame.Rect(objetivo_x, objetivo_y, objetivo_size, objetivo_size)
-        if mano_rect.colliderect(objetivo_rect):
-            tocado = True
-        # Dibujar
-        pantalla.fill(BLANCO)
-        pygame.draw.rect(pantalla, AZUL, mano_rect)
-        pygame.draw.ellipse(pantalla, ROJO, objetivo_rect)
-        if tocado:
-            font = pygame.font.SysFont(None, 60)
-            texto = font.render("¡Objetivo alcanzado!", True, VERDE)
-            pantalla.blit(texto, (ancho//2 - 200, alto//2 - 30))
+                juego_activo = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    juego_activo = False
+                elif event.key == pygame.K_SPACE:
+                    pausado = not pausado
+                elif event.key == pygame.K_r and not juego_activo:
+                    # Reiniciar juego
+                    return ejecutar_ejercicio(nivel, paciente)
+        
+        if pausado:
+            # Mostrar pantalla de pausa
+            pantalla.fill(GRIS_FONDO)
+            texto_pausa = fuente_grande.render("PAUSADO - Presiona ESPACIO para continuar", True, GRIS_OSCURO)
+            pantalla.blit(texto_pausa, (ancho//2 - texto_pausa.get_width()//2, alto//2))
             pygame.display.flip()
-            pygame.time.wait(2000)
-            break
+            reloj.tick(60)
+            continue
+        
+        if tiempo_restante <= 0:
+            juego_activo = False
+            continue
+        
+        # Control de movimiento mejorado
+        teclas = pygame.key.get_pressed()
+        movimiento_x = 0
+        movimiento_y = 0
+        
+        if teclas[pygame.K_LEFT] or teclas[pygame.K_a]:
+            movimiento_x = -velocidad
+        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d]:
+            movimiento_x = velocidad
+        if teclas[pygame.K_UP] or teclas[pygame.K_w]:
+            movimiento_y = -velocidad
+        if teclas[pygame.K_DOWN] or teclas[pygame.K_s]:
+            movimiento_y = velocidad
+        
+        # Movimiento diagonal suave
+        if movimiento_x != 0 and movimiento_y != 0:
+            movimiento_x *= 0.707  # Normalización para movimiento diagonal
+            movimiento_y *= 0.707
+        
+        mano_x += movimiento_x
+        mano_y += movimiento_y
+        
+        # Limitar movimiento dentro de la pantalla
+        mano_x = max(mano_size//2, min(ancho - mano_size//2, mano_x))
+        mano_y = max(mano_size//2, min(alto - mano_size//2, mano_y))
+        
+        # Registrar posición para métricas
+        metricas['posiciones_mano'].append((mano_x, mano_y))
+        if len(metricas['posiciones_mano']) > 100:
+            metricas['posiciones_mano'].pop(0)
+        
+        metricas['min_x'] = min(metricas['min_x'], mano_x)
+        metricas['max_x'] = max(metricas['max_x'], mano_x)
+        metricas['min_y'] = min(metricas['min_y'], mano_y)
+        metricas['max_y'] = max(metricas['max_y'], mano_y)
+        
+        # Calcular distancia recorrida
+        if len(metricas['posiciones_mano']) > 1:
+            dist = math.sqrt(
+                (metricas['posiciones_mano'][-1][0] - metricas['posiciones_mano'][-2][0])**2 +
+                (metricas['posiciones_mano'][-1][1] - metricas['posiciones_mano'][-2][1])**2
+            )
+            metricas['distancias_movimiento'].append(dist)
+        
+        # Movimiento del objetivo mejorado
+        if nivel > 1:
+            objetivo_pulso += 0.1
+            objetivo_brillo = abs(math.sin(objetivo_pulso)) * 50
+            
+            objetivo_x += objetivo_vx
+            objetivo_y += objetivo_vy
+            
+            # Rebote mejorado con amortiguación
+            bounce_damping = 0.95 if nivel == 2 else 0.9
+            
+            if objetivo_x <= objetivo_size or objetivo_x >= ancho - objetivo_size:
+                objetivo_vx *= -bounce_damping
+                objetivo_x = max(objetivo_size, min(ancho - objetivo_size, objetivo_x))
+                if nivel == 3:
+                    objetivo_vy += random.choice([-2, 2])
+            
+            if objetivo_y <= objetivo_size or objetivo_y >= alto - objetivo_size:
+                objetivo_vy *= -bounce_damping
+                objetivo_y = max(objetivo_size, min(alto - objetivo_size, objetivo_y))
+                if nivel == 3:
+                    objetivo_vx += random.choice([-2, 2])
+            
+            # Para nivel 3, agregar cambios de dirección aleatorios
+            if nivel == 3 and random.random() < 0.02:
+                objetivo_vx += random.choice([-3, 3])
+                objetivo_vy += random.choice([-3, 3])
+            
+            # Limitar velocidad máxima
+            velocidad_max = 8 if nivel == 2 else 12
+            velocidad_actual = math.sqrt(objetivo_vx**2 + objetivo_vy**2)
+            if velocidad_actual > velocidad_max:
+                factor = velocidad_max / velocidad_actual
+                objetivo_vx *= factor
+                objetivo_vy *= factor
+            
+            metricas['posiciones_objetivo'].append((objetivo_x, objetivo_y))
+            if len(metricas['posiciones_objetivo']) > 100:
+                metricas['posiciones_objetivo'].pop(0)
+        
+        # Detección de colisión mejorada
+        distancia = math.sqrt((mano_x - objetivo_x)**2 + (mano_y - objetivo_y)**2)
+        objetivo_anterior_tocado = objetivo_tocado
+        
+        if distancia <= (mano_size//2 + objetivo_size//2):
+            if not objetivo_tocado:
+                objetivo_tocado = True
+                aciertos += 1
+                combo += 1
+                max_combo = max(max_combo, combo)
+                
+                # Calcular tiempo de reacción
+                if ultimo_acierto_tiempo > 0:
+                    tiempo_reaccion = tiempo_actual - ultimo_acierto_tiempo
+                    metricas['tiempos_reaccion'].append(tiempo_reaccion)
+                ultimo_acierto_tiempo = tiempo_actual
+                
+                # Calcular puntuación con multiplicador de combo
+                puntos_base = nivel * 10
+                multiplicador_combo = 1 + (combo * 0.1)
+                puntos_obtenidos = int(puntos_base * multiplicador_combo)
+                puntuacion += puntos_obtenidos
+                
+                # Crear partículas de éxito
+                for _ in range(20):
+                    particulas.append({
+                        'x': objetivo_x,
+                        'y': objetivo_y,
+                        'vx': random.uniform(-5, 5),
+                        'vy': random.uniform(-5, 5),
+                        'life': 1.0,
+                        'color': VERDE_EXITO,
+                        'size': random.randint(3, 8)
+                    })
+                
+                # Reposicionar objetivo
+                objetivo_x = random.randint(objetivo_size, ancho - objetivo_size)
+                objetivo_y = random.randint(objetivo_size, alto - objetivo_size)
+                
+                if nivel == 2:
+                    objetivo_vx = random.choice([-2, 2])
+                    objetivo_vy = random.choice([-2, 2])
+                elif nivel == 3:
+                    objetivo_vx = random.choice([-5, 5])
+                    objetivo_vy = random.choice([-5, 5])
+        else:
+            if objetivo_anterior_tocado:
+                objetivo_tocado = False
+            combo = 0
+        
+        # Actualizar partículas
+        for particula in particulas[:]:
+            particula['x'] += particula['vx']
+            particula['y'] += particula['vy']
+            particula['life'] -= 0.02
+            particula['vx'] *= 0.98
+            particula['vy'] *= 0.98
+            
+            if particula['life'] <= 0:
+                particulas.remove(particula)
+        
+        # Efectos visuales
+        mano_pulso += 0.15
+        pulso_mano = math.sin(mano_pulso) * 3
+        
+        # Dibujar fondo con gradiente
+        pantalla.fill(GRIS_FONDO)
+        
+        # Dibujar cuadrícula de fondo
+        for x in range(0, ancho, 50):
+            pygame.draw.line(pantalla, (230, 230, 235), (x, 0), (x, alto), 1)
+        for y in range(0, alto, 50):
+            pygame.draw.line(pantalla, (230, 230, 235), (0, y), (ancho, y), 1)
+        
+        # Dibujar objetivo con efectos
+        objetivo_pulso_visual = math.sin(objetivo_pulso) * 5
+        objetivo_size_visual = objetivo_size + objetivo_pulso_visual
+        
+        # Brillo del objetivo
+        if nivel > 1:
+            brillo_color = (
+                min(255, ROJO_PRIMARIO[0] + int(objetivo_brillo)),
+                min(255, ROJO_PRIMARIO[1] + int(objetivo_brillo)),
+                min(255, ROJO_PRIMARIO[2] + int(objetivo_brillo))
+            )
+        else:
+            brillo_color = ROJO_PRIMARIO
+        
+        # Círculo exterior del objetivo
+        pygame.draw.circle(pantalla, brillo_color, (int(objetivo_x), int(objetivo_y)), int(objetivo_size_visual + 10), 3)
+        # Círculo principal del objetivo
+        pygame.draw.circle(pantalla, brillo_color, (int(objetivo_x), int(objetivo_y)), int(objetivo_size_visual))
+        # Círculo interior
+        pygame.draw.circle(pantalla, BLANCO, (int(objetivo_x), int(objetivo_y)), int(objetivo_size_visual * 0.6), 2)
+        # Centro del objetivo
+        pygame.draw.circle(pantalla, BLANCO, (int(objetivo_x), int(objetivo_y)), 5)
+        
+        # Dibujar mano virtual mejorada
+        mano_size_visual = mano_size + pulso_mano
+        
+        # Sombra de la mano
+        pygame.draw.circle(pantalla, (0, 0, 0, 50), (int(mano_x + 3), int(mano_y + 3)), int(mano_size_visual//2), 0)
+        
+        # Mano con gradiente simulado
+        pygame.draw.circle(pantalla, AZUL_SECUNDARIO, (int(mano_x), int(mano_y)), int(mano_size_visual//2))
+        pygame.draw.circle(pantalla, AZUL_PRIMARIO, (int(mano_x), int(mano_y)), int(mano_size_visual//2 * 0.8))
+        pygame.draw.circle(pantalla, BLANCO, (int(mano_x), int(mano_y)), int(mano_size_visual//2 * 0.5))
+        
+        # Dibujar partículas
+        for particula in particulas:
+            alpha = int(255 * particula['life'])
+            color_con_alpha = (*particula['color'][:3], alpha)
+            pygame.draw.circle(
+                pantalla,
+                particula['color'],
+                (int(particula['x']), int(particula['y'])),
+                particula['size']
+            )
+        
+        # Dibujar UI mejorada
+        # Panel superior
+        pygame.draw.rect(pantalla, (255, 255, 255, 200), (10, 10, ancho - 20, 80))
+        pygame.draw.rect(pantalla, AZUL_PRIMARIO, (10, 10, ancho - 20, 80), 3)
+        
+        # Tiempo restante
+        tiempo_texto = fuente_mediana.render(f"Tiempo: {int(tiempo_restante)}s", True, GRIS_OSCURO)
+        pantalla.blit(tiempo_texto, (30, 25))
+        
+        # Puntuación
+        puntuacion_texto = fuente_mediana.render(f"Puntos: {puntuacion}", True, VERDE_EXITO)
+        pantalla.blit(puntuacion_texto, (250, 25))
+        
+        # Aciertos
+        aciertos_texto = fuente_mediana.render(f"Aciertos: {aciertos}", True, AZUL_PRIMARIO)
+        pantalla.blit(aciertos_texto, (450, 25))
+        
+        # Precisión
+        total_intentos_actual = aciertos + fallos
+        precision_actual = (aciertos / total_intentos_actual * 100) if total_intentos_actual > 0 else 0
+        precision_texto = fuente_mediana.render(f"Precisión: {precision_actual:.1f}%", True, NARANJA)
+        pantalla.blit(precision_texto, (650, 25))
+        
+        # Combo
+        if combo > 1:
+            combo_texto = fuente_grande.render(f"COMBO x{combo}!", True, AMARILLO)
+            pantalla.blit(combo_texto, (850, 20))
+        
+        # Panel de métricas (lateral derecho)
+        panel_ancho = 200
+        pygame.draw.rect(pantalla, (255, 255, 255, 200), (ancho - panel_ancho - 10, 100, panel_ancho, alto - 110))
+        pygame.draw.rect(pantalla, AZUL_PRIMARIO, (ancho - panel_ancho - 10, 100, panel_ancho, alto - 110), 3)
+        
+        titulo_metricas = fuente_pequena.render("MÉTRICAS", True, AZUL_PRIMARIO)
+        pantalla.blit(titulo_metricas, (ancho - panel_ancho + 10, 110))
+        
+        y_offset = 140
+        # Velocidad promedio
+        if len(metricas['distancias_movimiento']) > 0:
+            velocidad_promedio = sum(metricas['distancias_movimiento'][-30:]) / min(30, len(metricas['distancias_movimiento'])) * 60
+            vel_texto = fuente_pequena.render(f"Velocidad: {velocidad_promedio:.1f} px/s", True, GRIS_OSCURO)
+            pantalla.blit(vel_texto, (ancho - panel_ancho + 10, y_offset))
+            y_offset += 25
+        
+        # Rango de movimiento
+        rango_x = metricas['max_x'] - metricas['min_x'] if metricas['max_x'] != float('-inf') else 0
+        rango_y = metricas['max_y'] - metricas['min_y'] if metricas['max_y'] != float('-inf') else 0
+        rango_texto = fuente_pequena.render(f"Rango: {max(rango_x, rango_y):.0f} px", True, GRIS_OSCURO)
+        pantalla.blit(rango_texto, (ancho - panel_ancho + 10, y_offset))
+        y_offset += 25
+        
+        # Tiempo de reacción promedio
+        if len(metricas['tiempos_reaccion']) > 0:
+            tiempo_reaccion_prom = sum(metricas['tiempos_reaccion']) / len(metricas['tiempos_reaccion']) * 1000
+            react_texto = fuente_pequena.render(f"Reacción: {tiempo_reaccion_prom:.0f} ms", True, GRIS_OSCURO)
+            pantalla.blit(react_texto, (ancho - panel_ancho + 10, y_offset))
+            y_offset += 25
+        
+        # Combo máximo
+        combo_max_texto = fuente_pequena.render(f"Combo Max: {max_combo}", True, GRIS_OSCURO)
+        pantalla.blit(combo_max_texto, (ancho - panel_ancho + 10, y_offset))
+        
+        # Instrucciones
+        instrucciones = [
+            "Flechas o WASD: Mover",
+            "ESPACIO: Pausar",
+            "ESC: Salir"
+        ]
+        y_inst = alto - 100
+        for instruccion in instrucciones:
+            inst_texto = fuente_pequena.render(instruccion, True, GRIS_OSCURO)
+            pantalla.blit(inst_texto, (30, y_inst))
+            y_inst += 20
+        
         pygame.display.flip()
-        reloj.tick(30)
+        reloj.tick(60)  # 60 FPS para animaciones suaves
+    
+    # Calcular métricas finales
+    tiempo_total = tiempo_limite - tiempo_restante
+    total_intentos = aciertos + fallos
+    precision_final = (aciertos / total_intentos * 100) if total_intentos > 0 else 0
+    
+    # Determinar éxito basado en criterios médicos
+    criterio_precision = nivel == 1 and 60 or nivel == 2 and 50 or 40
+    criterio_aciertos = nivel * 3
+    exito = precision_final >= criterio_precision and aciertos >= criterio_aciertos
+    
+    # Preparar métricas para registro
+    metricas_finales = {
+        'precision': round(precision_final, 2),
+        'puntuacion': puntuacion,
+        'aciertos': aciertos,
+        'fallos': fallos,
+        'tiempo_total': round(tiempo_total, 2),
+        'combo_maximo': max_combo,
+        'velocidad_promedio': round(sum(metricas['distancias_movimiento'][-30:]) / min(30, len(metricas['distancias_movimiento'])) * 60, 2) if metricas['distancias_movimiento'] else 0,
+        'rango_movimiento': round(max(rango_x, rango_y), 2),
+        'tiempo_reaccion_promedio': round(sum(metricas['tiempos_reaccion']) / len(metricas['tiempos_reaccion']) * 1000, 2) if metricas['tiempos_reaccion'] else 0
+    }
+    
+    # Mostrar pantalla de resultados
+    mostrar_resultados_pygame(pantalla, ancho, alto, exito, puntuacion, aciertos, precision_final, max_combo, metricas_finales, fuente_grande, fuente_mediana)
+    
     pygame.quit()
-    mostrar_ventana_exito()
-    return True
+    
+    # Registrar resultado con métricas
+    registrar_resultado(paciente, f"Ejercicio nivel {nivel}", exito)
+    
+    return exito
+
+def mostrar_resultados_pygame(pantalla, ancho, alto, exito, puntuacion, aciertos, precision, combo_max, metricas, fuente_grande, fuente_mediana):
+    """Muestra pantalla de resultados mejorada"""
+    import time
+    
+    BLANCO = (255, 255, 255)
+    VERDE_EXITO = (76, 175, 80)
+    NARANJA = (255, 152, 0)
+    GRIS_FONDO = (245, 247, 250)
+    AZUL_PRIMARIO = (25, 118, 210)
+    GRIS_OSCURO = (97, 97, 97)
+    
+    pantalla.fill(GRIS_FONDO)
+    
+    # Título
+    if exito:
+        titulo = fuente_grande.render("¡EXCELENTE TRABAJO!", True, VERDE_EXITO)
+    else:
+        titulo = fuente_grande.render("Continúa Practicando", True, NARANJA)
+    
+    pantalla.blit(titulo, (ancho//2 - titulo.get_width()//2, 100))
+    
+    # Estadísticas
+    y_pos = 200
+    estadisticas = [
+        f"Puntuación: {puntuacion}",
+        f"Aciertos: {aciertos}",
+        f"Precisión: {precision:.1f}%",
+        f"Combo Máximo: {combo_max}",
+        f"Velocidad Promedio: {metricas['velocidad_promedio']:.1f} px/s",
+        f"Rango de Movimiento: {metricas['rango_movimiento']:.0f} px",
+        f"Tiempo de Reacción: {metricas['tiempo_reaccion_promedio']:.0f} ms"
+    ]
+    
+    for estadistica in estadisticas:
+        texto = fuente_mediana.render(estadistica, True, GRIS_OSCURO)
+        pantalla.blit(texto, (ancho//2 - texto.get_width()//2, y_pos))
+        y_pos += 40
+    
+    # Instrucciones
+    instruccion = fuente_mediana.render("Presiona cualquier tecla para continuar...", True, AZUL_PRIMARIO)
+    pantalla.blit(instruccion, (ancho//2 - instruccion.get_width()//2, alto - 100))
+    
+    pygame.display.flip()
+    
+    # Esperar input del usuario
+    esperando = True
+    while esperando:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                esperando = False
+            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                esperando = False
+        time.sleep(0.1)
 
 def mostrar_ventana_exito():
     ventana = tk.Toplevel()

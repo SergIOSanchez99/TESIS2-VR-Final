@@ -71,6 +71,13 @@ def setup_directories():
     
     print("✅ Directorios creados/verificados")
 
+def get_python_executable():
+    """Obtiene el ejecutable de Python del entorno virtual o del sistema"""
+    venv_python = Path("venv") / "Scripts" / "python.exe"
+    if venv_python.exists():
+        return str(venv_python)
+    return sys.executable
+
 def install_backend_dependencies():
     """Instala las dependencias del backend"""
     print("📦 Instalando dependencias del backend...")
@@ -82,9 +89,11 @@ def install_backend_dependencies():
         print("❌ Error: No se encontró requirements.txt en el directorio backend")
         return False
     
+    python_exe = get_python_executable()
+    
     try:
         subprocess.run([
-            sys.executable, "-m", "pip", "install", "-r", str(requirements_file)
+            python_exe, "-m", "pip", "install", "-r", str(requirements_file)
         ], check=True)
         print("✅ Dependencias del backend instaladas")
         return True
@@ -125,6 +134,8 @@ def run_backend():
         print("❌ Error: No se encontró run.py en el directorio backend")
         return
     
+    python_exe = get_python_executable()
+    
     # Configurar variables de entorno
     env = os.environ.copy()
     env.update({
@@ -135,7 +146,7 @@ def run_backend():
     })
     
     try:
-        subprocess.run([sys.executable, "run.py"], cwd=backend_path, env=env)
+        subprocess.run([python_exe, "run.py"], cwd=backend_path, env=env)
     except KeyboardInterrupt:
         print("\n🛑 Backend detenido")
 

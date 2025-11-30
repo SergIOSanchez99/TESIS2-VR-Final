@@ -16,7 +16,7 @@ endblock %} {% block content %}
           </p>
 
           <div class="row g-4">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="card h-100">
                 <div class="card-body text-center">
                   <div class="mb-3">
@@ -37,7 +37,7 @@ endblock %} {% block content %}
               </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="card h-100">
                 <div class="card-body text-center">
                   <div class="mb-3">
@@ -57,11 +57,96 @@ endblock %} {% block content %}
                 </div>
               </div>
             </div>
+
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-body text-center">
+                  <div class="mb-3">
+                    <i class="fas fa-key fa-3x text-warning"></i>
+                  </div>
+                  <h5 class="card-title">Abrir Cerradura</h5>
+                  <p class="card-text">
+                    Ejercicio de motricidad fina para mejorar la destreza en
+                    tareas de precisión como usar llaves.
+                  </p>
+                  <button
+                    class="btn btn-warning"
+                    onclick="iniciarEjercicio('cerradura')"
+                  >
+                    <i class="fas fa-play me-2"></i>Comenzar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-body text-center">
+                  <div class="mb-3">
+                    <i class="fas fa-utensils fa-3x text-info"></i>
+                  </div>
+                  <h5 class="card-title">Usar Cubiertos</h5>
+                  <p class="card-text">
+                    Simulación de uso de cubiertos para mejorar la coordinación
+                    y habilidades de alimentación independiente.
+                  </p>
+                  <button
+                    class="btn btn-info"
+                    onclick="iniciarEjercicio('cubiertos')"
+                  >
+                    <i class="fas fa-play me-2"></i>Comenzar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-body text-center">
+                  <div class="mb-3">
+                    <i class="fas fa-puzzle-piece fa-3x text-danger"></i>
+                  </div>
+                  <h5 class="card-title">Rompecabezas</h5>
+                  <p class="card-text">
+                    Ejercicio de organización espacial y resolución de problemas
+                    para mejorar la función cognitiva y motora.
+                  </p>
+                  <button
+                    class="btn btn-danger"
+                    onclick="iniciarEjercicio('rompecabezas')"
+                  >
+                    <i class="fas fa-play me-2"></i>Comenzar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-body text-center">
+                  <div class="mb-3">
+                    <i class="fas fa-swatchbook fa-3x" style="color: #9c27b0;"></i>
+                  </div>
+                  <h5 class="card-title">Clasificar Objetos</h5>
+                  <p class="card-text">
+                    Ejercicio de organización y categorización para mejorar
+                    habilidades de planificación y ejecución.
+                  </p>
+                  <button
+                    class="btn"
+                    style="background: #9c27b0; color: white;"
+                    onclick="iniciarEjercicio('clasificar')"
+                  >
+                    <i class="fas fa-play me-2"></i>Comenzar
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="text-center mt-4">
             <a
-              href="{{ url_for('dashboard') }}"
+              href="{{ url_for('main.dashboard') }}"
               class="btn btn-outline-secondary"
             >
               <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
@@ -165,21 +250,135 @@ endblock %} {% block content %}
     </div>
   </div>
 </div>
+
+<!-- Modal Cerradura -->
+<div class="modal fade" id="cerraduraModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-key me-2"></i>Abrir Cerradura
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="cerraduraGame" style="position: relative; height: 400px; background: #f8f9fa; border-radius: 10px;"></div>
+        <div class="mt-3">
+          <p class="text-muted">Gira la llave para abrir la cerradura</p>
+          <div id="cerraduraProgress" class="progress mb-3">
+            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cubiertos -->
+<div class="modal fade" id="cubiertosModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-utensils me-2"></i>Usar Cubiertos
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="cubiertosGame" style="position: relative; height: 400px; background: #f8f9fa; border-radius: 10px;"></div>
+        <div class="mt-3">
+          <p class="text-muted">Arrastra la comida al plato usando los cubiertos</p>
+          <div id="cubiertosProgress" class="progress mb-3">
+            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Rompecabezas -->
+<div class="modal fade" id="rompecabezasModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-puzzle-piece me-2"></i>Rompecabezas
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="rompecabezasGame" style="position: relative; height: 500px; background: #f8f9fa; border-radius: 10px;"></div>
+        <div class="mt-3">
+          <p class="text-muted">Arrastra las piezas a su posición correcta</p>
+          <div id="rompecabezasProgress" class="progress mb-3">
+            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Clasificar -->
+<div class="modal fade" id="clasificarModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-swatchbook me-2"></i>Clasificar Objetos
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="clasificarGame" style="position: relative; height: 400px; background: #f8f9fa; border-radius: 10px;"></div>
+        <div class="mt-3">
+          <p class="text-muted">Arrastra los objetos a su categoría correspondiente</p>
+          <div id="clasificarProgress" class="progress mb-3">
+            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %} {% block extra_js %}
 <script>
   function iniciarEjercicio(tipo) {
-    if (tipo === "abotonar") {
-      const modal = new bootstrap.Modal(
-        document.getElementById("abotonarModal")
-      );
+    const modals = {
+      abotonar: "abotonarModal",
+      arrastrar: "arrastrarModal",
+      cerradura: "cerraduraModal",
+      cubiertos: "cubiertosModal",
+      rompecabezas: "rompecabezasModal",
+      clasificar: "clasificarModal"
+    };
+
+    const funciones = {
+      abotonar: iniciarAbotonar,
+      arrastrar: iniciarArrastrar,
+      cerradura: iniciarCerradura,
+      cubiertos: iniciarCubiertos,
+      rompecabezas: iniciarRompecabezas,
+      clasificar: iniciarClasificar
+    };
+
+    if (modals[tipo] && funciones[tipo]) {
+      const modal = new bootstrap.Modal(document.getElementById(modals[tipo]));
       modal.show();
-      setTimeout(() => iniciarAbotonar(), 500);
-    } else if (tipo === "arrastrar") {
-      const modal = new bootstrap.Modal(
-        document.getElementById("arrastrarModal")
-      );
-      modal.show();
-      setTimeout(() => iniciarArrastrar(), 500);
+      setTimeout(() => funciones[tipo](), 500);
     }
   }
 
@@ -189,55 +388,126 @@ endblock %} {% block content %}
       "#abotonarProgress .progress-bar"
     );
 
-    // Clear container
     gameContainer.innerHTML = "";
 
-    // Create shirt with buttons
+    // Create shirt with realistic design
     const shirt = document.createElement("div");
     shirt.style.cssText = `
         position: absolute;
-        top: 50px;
+        top: 30px;
         left: 50%;
         transform: translateX(-50%);
-        width: 200px;
-        height: 250px;
-        background: #e3f2fd;
-        border: 2px solid #1976d2;
-        border-radius: 10px;
+        width: 220px;
+        height: 280px;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border: 3px solid #1976d2;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     `;
 
+    // Add collar
+    const collar = document.createElement("div");
+    collar.style.cssText = `
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 180px;
+        height: 40px;
+        background: #1976d2;
+        border-radius: 20px 20px 0 0;
+    `;
+    shirt.appendChild(collar);
+
     const buttons = [];
-    const buttonCount = 5;
+    const buttonHoles = [];
+    const buttonCount = 6;
+    let completed = 0;
+    let startTime = Date.now();
 
     for (let i = 0; i < buttonCount; i++) {
+      // Button hole
+      const hole = document.createElement("div");
+      hole.style.cssText = `
+            position: absolute;
+            left: 48%;
+            width: 25px;
+            height: 8px;
+            background: #424242;
+            border-radius: 4px;
+            top: ${90 + i * 35}px;
+        `;
+      buttonHoles.push(hole);
+      shirt.appendChild(hole);
+
+      // Button
       const button = document.createElement("div");
       button.style.cssText = `
             position: absolute;
-            left: 50%;
+            left: 52%;
             transform: translateX(-50%);
-            width: 30px;
-            height: 30px;
-            background: #1976d2;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 3px solid #fff;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            top: ${85 + i * 35}px;
         `;
-      button.style.top = `${80 + i * 30}px`;
+      
+      // Add button detail
+      const buttonCenter = document.createElement("div");
+      buttonCenter.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+        `;
+      button.appendChild(buttonCenter);
+
+      button.addEventListener("mouseenter", function() {
+        if (!this.classList.contains("completed")) {
+          this.style.transform = "translateX(-50%) scale(1.1)";
+          this.style.boxShadow = "0 4px 8px rgba(0,0,0,0.4)";
+        }
+      });
+
+      button.addEventListener("mouseleave", function() {
+        if (!this.classList.contains("completed")) {
+          this.style.transform = "translateX(-50%) scale(1)";
+          this.style.boxShadow = "0 3px 6px rgba(0,0,0,0.3)";
+        }
+      });
 
       button.addEventListener("click", function () {
         if (!this.classList.contains("completed")) {
-          this.style.background = "#43a047";
+          // Animate button going through hole
+          this.style.transition = "all 0.5s ease";
+          this.style.left = "48%";
+          this.style.background = "linear-gradient(135deg, #43a047 0%, #2e7d32 100%)";
           this.classList.add("completed");
+          
+          // Animate hole closing
+          const correspondingHole = buttonHoles[i];
+          correspondingHole.style.transition = "all 0.5s ease";
+          correspondingHole.style.width = "0px";
 
-          const completed = document.querySelectorAll(".completed").length;
+          completed++;
           const progress = (completed / buttonCount) * 100;
           progressBar.style.width = progress + "%";
+          progressBar.textContent = `${Math.round(progress)}%`;
 
           if (completed === buttonCount) {
+            const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
             setTimeout(() => {
               registrarResultado("Abotonar camisa", true);
-              alert("¡Excelente! Has completado el ejercicio de abotonar.");
+              alert(`¡Excelente! Has completado el ejercicio en ${elapsedTime} segundos.`);
               bootstrap.Modal.getInstance(
                 document.getElementById("abotonarModal")
               ).hide();
@@ -259,111 +529,583 @@ endblock %} {% block content %}
       "#arrastrarProgress .progress-bar"
     );
 
-    // Clear container
     gameContainer.innerHTML = "";
 
-    // Create draggable object
-    const objeto = document.createElement("div");
-    objeto.style.cssText = `
+    const objects = [
+      { emoji: "📦", color: "#ff9800", name: "Caja" },
+      { emoji: "📚", color: "#2196f3", name: "Libro" },
+      { emoji: "☕", color: "#795548", name: "Taza" },
+      { emoji: "🍎", color: "#f44336", name: "Manzana" }
+    ];
+
+    let completed = 0;
+    const startTime = Date.now();
+
+    objects.forEach((obj, index) => {
+      // Create draggable object
+      const objeto = document.createElement("div");
+      objeto.style.cssText = `
         position: absolute;
-        top: 50px;
+        top: ${50 + index * 70}px;
         left: 50px;
-        width: 60px;
-        height: 60px;
-        background: #ff9800;
-        border-radius: 10px;
+        width: 70px;
+        height: 70px;
+        background: ${obj.color};
+        border-radius: 15px;
         cursor: grab;
-        border: 2px solid #fff;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        border: 3px solid #fff;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        transition: transform 0.2s ease;
+      `;
+      objeto.textContent = obj.emoji;
+      objeto.dataset.name = obj.name;
+      objeto.dataset.index = index;
+
+      // Create corresponding target area
+      const target = document.createElement("div");
+      target.style.cssText = `
+        position: absolute;
+        top: ${50 + index * 70}px;
+        right: 50px;
+        width: 100px;
+        height: 80px;
+        background: ${obj.color}20;
+        border: 3px dashed ${obj.color};
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: ${obj.color};
+        font-weight: bold;
+        font-size: 12px;
+        transition: all 0.3s ease;
+      `;
+      target.innerHTML = `<div style="font-size: 24px;">${obj.emoji}</div><div>${obj.name}</div>`;
+      target.dataset.target = obj.name;
+
+      let isDragging = false;
+      let offsetX, offsetY;
+
+      objeto.addEventListener("mousedown", function(e) {
+        isDragging = true;
+        offsetX = e.clientX - objeto.getBoundingClientRect().left;
+        offsetY = e.clientY - objeto.getBoundingClientRect().top;
+        objeto.style.cursor = "grabbing";
+        objeto.style.transform = "scale(1.1)";
+        objeto.style.zIndex = "1000";
+      });
+
+      document.addEventListener("mousemove", function(e) {
+        if (isDragging && objeto.dataset.completed !== "true") {
+          const containerRect = gameContainer.getBoundingClientRect();
+          objeto.style.left = (e.clientX - containerRect.left - offsetX) + "px";
+          objeto.style.top = (e.clientY - containerRect.top - offsetY) + "px";
+          
+          // Highlight target when hovering
+          const objetoRect = objeto.getBoundingClientRect();
+          const targetRect = target.getBoundingClientRect();
+          if (
+            objetoRect.left < targetRect.right &&
+            objetoRect.right > targetRect.left &&
+            objetoRect.top < targetRect.bottom &&
+            objetoRect.bottom > targetRect.top
+          ) {
+            target.style.background = obj.color + "40";
+            target.style.transform = "scale(1.05)";
+          } else {
+            target.style.background = obj.color + "20";
+            target.style.transform = "scale(1)";
+          }
+        }
+      });
+
+      document.addEventListener("mouseup", function() {
+        if (isDragging) {
+          isDragging = false;
+          objeto.style.cursor = "grab";
+          objeto.style.transform = "scale(1)";
+          objeto.style.zIndex = "1";
+
+          // Check if object is in correct target area
+          const objetoRect = objeto.getBoundingClientRect();
+          const targetRect = target.getBoundingClientRect();
+
+          if (
+            objetoRect.left < targetRect.right &&
+            objetoRect.right > targetRect.left &&
+            objetoRect.top < targetRect.bottom &&
+            objetoRect.bottom > targetRect.top &&
+            objeto.dataset.name === target.dataset.target &&
+            objeto.dataset.completed !== "true"
+          ) {
+            objeto.dataset.completed = "true";
+            objeto.style.left = (targetRect.left - gameContainer.getBoundingClientRect().left + 15) + "px";
+            objeto.style.top = (targetRect.top - gameContainer.getBoundingClientRect().top + 5) + "px";
+            objeto.style.pointerEvents = "none";
+            objeto.style.opacity = "0.9";
+            target.style.background = obj.color + "60";
+            target.style.borderStyle = "solid";
+            
+            completed++;
+            progressBar.style.width = (completed / objects.length * 100) + "%";
+            progressBar.textContent = `${Math.round(completed / objects.length * 100)}%`;
+
+            if (completed === objects.length) {
+              const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+              setTimeout(() => {
+                registrarResultado("Arrastrar y soltar objeto", true);
+                alert(`¡Perfecto! Has completado el ejercicio en ${elapsedTime} segundos.`);
+                bootstrap.Modal.getInstance(
+                  document.getElementById("arrastrarModal")
+                ).hide();
+              }, 1000);
+            }
+          } else {
+            target.style.background = obj.color + "20";
+            target.style.transform = "scale(1)";
+          }
+        }
+      });
+
+      gameContainer.appendChild(objeto);
+      gameContainer.appendChild(target);
+    });
+  }
+
+  function iniciarCerradura() {
+    const gameContainer = document.getElementById("cerraduraGame");
+    const progressBar = document.querySelector("#cerraduraProgress .progress-bar");
+    gameContainer.innerHTML = "";
+
+    const lock = document.createElement("div");
+    lock.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      background: #424242;
+      border-radius: 10px;
+      border: 4px solid #212121;
+    `;
+
+    const keyhole = document.createElement("div");
+    keyhole.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 50px;
+      background: #757575;
+      border-radius: 15px 15px 5px 5px;
+    `;
+
+    const key = document.createElement("div");
+    key.style.cssText = `
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%) rotate(0deg);
+      width: 20px;
+      height: 60px;
+      background: #ffc107;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    `;
+    key.innerHTML = '<div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 20px; background: #ffc107; border-radius: 3px;"></div>';
+
+    let rotation = 0;
+    let progress = 0;
+
+    key.addEventListener("mousedown", function(e) {
+      const startY = e.clientY;
+      const startRotation = rotation;
+
+      function rotate(e) {
+        const deltaY = startY - e.clientY;
+        rotation = Math.max(0, Math.min(90, startRotation + deltaY * 2));
+        key.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+        progress = (rotation / 90) * 100;
+        progressBar.style.width = progress + "%";
+        
+        if (rotation >= 90) {
+          document.removeEventListener("mousemove", rotate);
+          document.removeEventListener("mouseup", stopRotate);
+          lock.style.background = "#43a047";
+          setTimeout(() => {
+            registrarResultado("Abrir cerradura", true);
+            alert("¡Excelente! Has abierto la cerradura correctamente.");
+            bootstrap.Modal.getInstance(document.getElementById("cerraduraModal")).hide();
+          }, 500);
+        }
+      }
+
+      function stopRotate() {
+        document.removeEventListener("mousemove", rotate);
+        document.removeEventListener("mouseup", stopRotate);
+      }
+
+      document.addEventListener("mousemove", rotate);
+      document.addEventListener("mouseup", stopRotate);
+    });
+
+    lock.appendChild(keyhole);
+    lock.appendChild(key);
+    gameContainer.appendChild(lock);
+  }
+
+  function iniciarCubiertos() {
+    const gameContainer = document.getElementById("cubiertosGame");
+    const progressBar = document.querySelector("#cubiertosProgress .progress-bar");
+    gameContainer.innerHTML = "";
+
+    const plate = document.createElement("div");
+    plate.style.cssText = `
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 150px;
+      background: #e0e0e0;
+      border-radius: 50%;
+      border: 3px solid #bdbdbd;
+    `;
+
+    const fork = document.createElement("div");
+    fork.style.cssText = `
+      position: absolute;
+      top: 50px;
+      left: 100px;
+      width: 8px;
+      height: 80px;
+      background: #757575;
+      cursor: grab;
+      border-radius: 2px;
+    `;
+    fork.innerHTML = '<div style="position: absolute; top: -10px; left: -5px; width: 18px; height: 15px; background: #757575; border-radius: 2px;"></div>';
+
+    const foods = [];
+    const foodCount = 5;
+    let completed = 0;
+
+    for (let i = 0; i < foodCount; i++) {
+      const food = document.createElement("div");
+      food.style.cssText = `
+        position: absolute;
+        top: ${50 + i * 50}px;
+        right: 100px;
+        width: 40px;
+        height: 40px;
+        background: #ff9800;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      `;
+      food.dataset.index = i;
+      foods.push(food);
+      gameContainer.appendChild(food);
+    }
+
+    let isDragging = false;
+    let draggedFood = null;
+
+    fork.addEventListener("mousedown", function() {
+      fork.style.cursor = "grabbing";
+    });
+
+    document.addEventListener("mouseup", function() {
+      fork.style.cursor = "grab";
+      if (draggedFood && isDragging) {
+        const plateRect = plate.getBoundingClientRect();
+        const foodRect = draggedFood.getBoundingClientRect();
+        
+        if (
+          foodRect.left < plateRect.right &&
+          foodRect.right > plateRect.left &&
+          foodRect.top < plateRect.bottom &&
+          foodRect.bottom > plateRect.top
+        ) {
+          draggedFood.style.display = "none";
+          completed++;
+          progressBar.style.width = (completed / foodCount * 100) + "%";
+          
+          if (completed === foodCount) {
+            setTimeout(() => {
+              registrarResultado("Usar cubiertos", true);
+              alert("¡Perfecto! Has completado el ejercicio de usar cubiertos.");
+              bootstrap.Modal.getInstance(document.getElementById("cubiertosModal")).hide();
+            }, 500);
+          }
+        }
+      }
+      isDragging = false;
+      draggedFood = null;
+    });
+
+    foods.forEach(food => {
+      food.addEventListener("mousedown", function(e) {
+        isDragging = true;
+        draggedFood = this;
+        fork.style.left = (e.clientX - gameContainer.getBoundingClientRect().left - 4) + "px";
+        fork.style.top = (e.clientY - gameContainer.getBoundingClientRect().top - 10) + "px";
+      });
+    });
+
+    gameContainer.appendChild(plate);
+    gameContainer.appendChild(fork);
+  }
+
+  function iniciarRompecabezas() {
+    const gameContainer = document.getElementById("rompecabezasGame");
+    const progressBar = document.querySelector("#rompecabezasProgress .progress-bar");
+    gameContainer.innerHTML = "";
+
+    const puzzleSize = 3;
+    const pieceSize = 80;
+    const pieces = [];
+    let completed = 0;
+
+    // Create puzzle board
+    const board = document.createElement("div");
+    board.style.cssText = `
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: ${puzzleSize * pieceSize}px;
+      height: ${puzzleSize * pieceSize}px;
+      border: 2px solid #1976d2;
+      background: #e3f2fd;
+    `;
+
+    // Create pieces
+    for (let i = 0; i < puzzleSize * puzzleSize; i++) {
+      const piece = document.createElement("div");
+      const row = Math.floor(i / puzzleSize);
+      const col = i % puzzleSize;
+      
+      piece.style.cssText = `
+        position: absolute;
+        width: ${pieceSize - 2}px;
+        height: ${pieceSize - 2}px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 1px solid #fff;
+        cursor: move;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
         font-weight: bold;
-    `;
-    objeto.textContent = "📦";
+        font-size: 24px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      `;
+      piece.textContent = i + 1;
+      piece.dataset.correctRow = row;
+      piece.dataset.correctCol = col;
+      piece.dataset.index = i;
+      
+      // Random initial position
+      const randomX = Math.random() * (gameContainer.offsetWidth - pieceSize) + 50;
+      const randomY = Math.random() * (gameContainer.offsetHeight - pieceSize - 100) + 250;
+      piece.style.left = randomX + "px";
+      piece.style.top = randomY + "px";
+      
+      pieces.push(piece);
+      gameContainer.appendChild(piece);
+    }
 
-    // Create target area
-    const target = document.createElement("div");
-    target.style.cssText = `
+    // Make pieces draggable
+    pieces.forEach(piece => {
+      let isDragging = false;
+      let offsetX, offsetY;
+
+      piece.addEventListener("mousedown", function(e) {
+        isDragging = true;
+        offsetX = e.clientX - piece.getBoundingClientRect().left;
+        offsetY = e.clientY - piece.getBoundingClientRect().top;
+        piece.style.zIndex = "1000";
+      });
+
+      document.addEventListener("mousemove", function(e) {
+        if (isDragging) {
+          piece.style.left = (e.clientX - gameContainer.getBoundingClientRect().left - offsetX) + "px";
+          piece.style.top = (e.clientY - gameContainer.getBoundingClientRect().top - offsetY) + "px";
+        }
+      });
+
+      document.addEventListener("mouseup", function() {
+        if (isDragging) {
+          isDragging = false;
+          piece.style.zIndex = "1";
+          
+          // Check if piece is in correct position
+          const pieceRect = piece.getBoundingClientRect();
+          const boardRect = board.getBoundingClientRect();
+          const correctRow = parseInt(piece.dataset.correctRow);
+          const correctCol = parseInt(piece.dataset.correctCol);
+          
+          const correctX = boardRect.left + correctCol * pieceSize;
+          const correctY = boardRect.top + correctRow * pieceSize;
+          
+          if (
+            Math.abs(pieceRect.left - correctX) < pieceSize / 2 &&
+            Math.abs(pieceRect.top - correctY) < pieceSize / 2
+          ) {
+            piece.style.left = correctX - gameContainer.getBoundingClientRect().left + "px";
+            piece.style.top = correctY - gameContainer.getBoundingClientRect().top + "px";
+            piece.style.pointerEvents = "none";
+            piece.style.opacity = "0.8";
+            completed++;
+            progressBar.style.width = (completed / (puzzleSize * puzzleSize) * 100) + "%";
+            
+            if (completed === puzzleSize * puzzleSize) {
+              setTimeout(() => {
+                registrarResultado("Rompecabezas", true);
+                alert("¡Excelente! Has completado el rompecabezas.");
+                bootstrap.Modal.getInstance(document.getElementById("rompecabezasModal")).hide();
+              }, 500);
+            }
+          }
+        }
+      });
+    });
+
+    gameContainer.appendChild(board);
+  }
+
+  function iniciarClasificar() {
+    const gameContainer = document.getElementById("clasificarGame");
+    const progressBar = document.querySelector("#clasificarProgress .progress-bar");
+    gameContainer.innerHTML = "";
+
+    const categories = [
+      { name: "Frutas", color: "#ff9800", items: ["🍎", "🍌", "🍊"] },
+      { name: "Verduras", color: "#4caf50", items: ["🥕", "🥦", "🥒"] },
+      { name: "Herramientas", color: "#2196f3", items: ["🔨", "🔧", "🪚"] }
+    ];
+
+    const allItems = categories.flatMap(cat => cat.items);
+    const shuffledItems = [...allItems].sort(() => Math.random() - 0.5);
+    let completed = 0;
+
+    // Create category boxes
+    categories.forEach((category, catIndex) => {
+      const box = document.createElement("div");
+      box.style.cssText = `
         position: absolute;
-        top: 250px;
-        right: 50px;
-        width: 100px;
-        height: 80px;
-        background: #e8f5e8;
-        border: 3px dashed #43a047;
+        bottom: 50px;
+        left: ${50 + catIndex * 200}px;
+        width: 150px;
+        height: 100px;
+        background: ${category.color}20;
+        border: 3px dashed ${category.color};
         border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #43a047;
         font-weight: bold;
-    `;
-    target.textContent = "Destino";
+        color: ${category.color};
+      `;
+      box.textContent = category.name;
+      box.dataset.category = category.name;
+      gameContainer.appendChild(box);
+    });
 
-    let isDragging = false;
-    let currentX, currentY, initialX, initialY;
+    // Create draggable items
+    shuffledItems.forEach((item, index) => {
+      const itemDiv = document.createElement("div");
+      itemDiv.style.cssText = `
+        position: absolute;
+        top: ${50 + Math.floor(index / 3) * 80}px;
+        left: ${50 + (index % 3) * 100}px;
+        width: 60px;
+        height: 60px;
+        font-size: 40px;
+        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      `;
+      itemDiv.textContent = item;
+      itemDiv.dataset.item = item;
+      gameContainer.appendChild(itemDiv);
 
-    objeto.addEventListener("mousedown", startDragging);
-    document.addEventListener("mousemove", drag);
-    document.addEventListener("mouseup", stopDragging);
+      let isDragging = false;
+      let offsetX, offsetY;
 
-    function startDragging(e) {
-      initialX = e.clientX - objeto.offsetLeft;
-      initialY = e.clientY - objeto.offsetTop;
-      isDragging = true;
-      objeto.style.cursor = "grabbing";
-    }
+      itemDiv.addEventListener("mousedown", function(e) {
+        isDragging = true;
+        offsetX = e.clientX - itemDiv.getBoundingClientRect().left;
+        offsetY = e.clientY - itemDiv.getBoundingClientRect().top;
+        itemDiv.style.cursor = "grabbing";
+      });
 
-    function drag(e) {
-      if (isDragging) {
-        e.preventDefault();
-        currentX = e.clientX - initialX;
-        currentY = e.clientY - initialY;
+      document.addEventListener("mousemove", function(e) {
+        if (isDragging) {
+          itemDiv.style.left = (e.clientX - gameContainer.getBoundingClientRect().left - offsetX) + "px";
+          itemDiv.style.top = (e.clientY - gameContainer.getBoundingClientRect().top - offsetY) + "px";
+        }
+      });
 
-        objeto.style.left = currentX + "px";
-        objeto.style.top = currentY + "px";
-      }
-    }
-
-    function stopDragging() {
-      isDragging = false;
-      objeto.style.cursor = "grab";
-
-      // Check if object is in target area
-      const objetoRect = objeto.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
-
-      if (
-        objetoRect.left < targetRect.right &&
-        objetoRect.right > targetRect.left &&
-        objetoRect.top < targetRect.bottom &&
-        objetoRect.bottom > targetRect.top
-      ) {
-        objeto.style.background = "#43a047";
-        target.style.background = "#c8e6c9";
-        target.style.borderColor = "#2e7d32";
-        progressBar.style.width = "100%";
-
-        setTimeout(() => {
-          registrarResultado("Arrastrar y soltar objeto", true);
-          alert(
-            "¡Perfecto! Has completado el ejercicio de arrastrar y soltar."
-          );
-          bootstrap.Modal.getInstance(
-            document.getElementById("arrastrarModal")
-          ).hide();
-        }, 1000);
-      }
-    }
-
-    gameContainer.appendChild(objeto);
-    gameContainer.appendChild(target);
+      document.addEventListener("mouseup", function() {
+        if (isDragging) {
+          isDragging = false;
+          itemDiv.style.cursor = "grab";
+          
+          const itemRect = itemDiv.getBoundingClientRect();
+          const correctCategory = categories.find(cat => cat.items.includes(item));
+          
+          document.querySelectorAll('[data-category]').forEach(box => {
+            const boxRect = box.getBoundingClientRect();
+            if (
+              itemRect.left < boxRect.right &&
+              itemRect.right > boxRect.left &&
+              itemRect.top < boxRect.bottom &&
+              itemRect.bottom > boxRect.top
+            ) {
+              if (box.dataset.category === correctCategory.name) {
+                itemDiv.style.display = "none";
+                completed++;
+                progressBar.style.width = (completed / allItems.length * 100) + "%";
+                
+                if (completed === allItems.length) {
+                  setTimeout(() => {
+                    registrarResultado("Clasificar objetos", true);
+                    alert("¡Perfecto! Has clasificado todos los objetos correctamente.");
+                    bootstrap.Modal.getInstance(document.getElementById("clasificarModal")).hide();
+                  }, 500);
+                }
+              } else {
+                itemDiv.style.transform = "translateX(10px)";
+                setTimeout(() => {
+                  itemDiv.style.transform = "translateX(-10px)";
+                  setTimeout(() => {
+                    itemDiv.style.transform = "translateX(0)";
+                  }, 100);
+                }, 100);
+              }
+            }
+          });
+        }
+      });
+    });
   }
 
   function registrarResultado(ejercicio, exito) {
-    fetch("/api/registrar_resultado", {
+    fetch("/api/ejercicios/resultado", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

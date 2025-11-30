@@ -135,10 +135,30 @@ class EjercicioService:
     def registrar_resultado(self, paciente: Paciente, ejercicio_id: str, exito: bool,
                           tiempo_ejecucion: Optional[float] = None,
                           puntuacion: Optional[int] = None,
-                          observaciones: Optional[str] = None):
-        """Registra el resultado de un ejercicio"""
+                          observaciones: Optional[str] = None,
+                          precision: Optional[float] = None,
+                          velocidad_promedio: Optional[float] = None,
+                          rango_movimiento: Optional[float] = None,
+                          tiempo_reaccion_promedio: Optional[float] = None,
+                          tasa_aciertos: Optional[float] = None,
+                          consistencia: Optional[float] = None,
+                          combo_maximo: Optional[int] = None,
+                          aciertos: Optional[int] = None,
+                          fallos: Optional[int] = None,
+                          nivel: Optional[int] = None):
+        """Registra el resultado de un ejercicio con métricas médicas avanzadas"""
         return self.ejercicio_repo.registrar_resultado(
-            paciente.id, ejercicio_id, exito, tiempo_ejecucion, puntuacion, observaciones
+            paciente.id, ejercicio_id, exito, tiempo_ejecucion, puntuacion, observaciones,
+            precision=precision,
+            velocidad_promedio=velocidad_promedio,
+            rango_movimiento=rango_movimiento,
+            tiempo_reaccion_promedio=tiempo_reaccion_promedio,
+            tasa_aciertos=tasa_aciertos,
+            consistencia=consistencia,
+            combo_maximo=combo_maximo,
+            aciertos=aciertos,
+            fallos=fallos,
+            nivel=nivel
         )
     
     def obtener_estadisticas_ejercicio(self, paciente_id: str, ejercicio_id: str) -> Dict:

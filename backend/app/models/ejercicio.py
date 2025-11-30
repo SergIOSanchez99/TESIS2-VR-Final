@@ -33,6 +33,16 @@ class ResultadoEjercicio:
     tiempo_ejecucion: Optional[float] = None
     puntuacion: Optional[int] = None
     observaciones: Optional[str] = None
+    # Métricas médicas avanzadas
+    precision: Optional[float] = None
+    velocidad_promedio: Optional[float] = None
+    rango_movimiento: Optional[float] = None
+    tiempo_reaccion_promedio: Optional[float] = None
+    tasa_aciertos: Optional[float] = None
+    consistencia: Optional[float] = None
+    combo_maximo: Optional[int] = None
+    aciertos: Optional[int] = None
+    fallos: Optional[int] = None
     
     def __post_init__(self):
         if not self.fecha:
@@ -45,6 +55,15 @@ class ResultadoEjercicio:
     @classmethod
     def from_dict(cls, data: Dict) -> 'ResultadoEjercicio':
         """Crea un resultado desde un diccionario"""
+        # Manejar campos opcionales que pueden no existir en datos antiguos
+        campos_opcionales = {
+            'precision', 'velocidad_promedio', 'rango_movimiento',
+            'tiempo_reaccion_promedio', 'tasa_aciertos', 'consistencia',
+            'combo_maximo', 'aciertos', 'fallos'
+        }
+        for campo in campos_opcionales:
+            if campo not in data:
+                data[campo] = None
         return cls(**data)
 
 
@@ -84,16 +103,49 @@ class EjercicioRepository:
     def registrar_resultado(self, paciente_id: str, ejercicio: str, exito: bool, 
                           tiempo_ejecucion: Optional[float] = None,
                           puntuacion: Optional[int] = None,
-                          observaciones: Optional[str] = None) -> ResultadoEjercicio:
-        """Registra un resultado de ejercicio"""
+                          observaciones: Optional[str] = None,
+                          precision: Optional[float] = None,
+                          velocidad_promedio: Optional[float] = None,
+                          rango_movimiento: Optional[float] = None,
+                          tiempo_reaccion_promedio: Optional[float] = None,
+                          tasa_aciertos: Optional[float] = None,
+                          consistencia: Optional[float] = None,
+                          combo_maximo: Optional[int] = None,
+                          aciertos: Optional[int] = None,
+                          fallos: Optional[int] = None,
+                          nivel: Optional[int] = None) -> ResultadoEjercicio:
+        """Registra un resultado de ejercicio con métricas médicas avanzadas"""
+        # Parsear observaciones si es JSON string
+        if observaciones and isinstance(observaciones, str):
+            try:
+                obs_dict = json.loads(observaciones)
+                precision = precision or obs_dict.get('precision')
+                velocidad_promedio = velocidad_promedio or obs_dict.get('avgSpeed')
+                rango_movimiento = rango_movimiento or obs_dict.get('movementRange')
+                tiempo_reaccion_promedio = tiempo_reaccion_promedio or obs_dict.get('avgReactionTime')
+                tasa_aciertos = tasa_aciertos or obs_dict.get('hitRate')
+                consistencia = consistencia or obs_dict.get('consistency')
+                combo_maximo = combo_maximo or obs_dict.get('maxCombo')
+            except (json.JSONDecodeError, TypeError):
+                pass
+        
         resultado = ResultadoEjercicio(
             paciente_id=paciente_id,
             tipo_ejercicio=ejercicio,
-            nivel=1,  # Por defecto, se puede mejorar
+            nivel=nivel or 1,
             exito=exito,
             tiempo_ejecucion=tiempo_ejecucion,
             puntuacion=puntuacion,
-            observaciones=observaciones
+            observaciones=observaciones,
+            precision=precision,
+            velocidad_promedio=velocidad_promedio,
+            rango_movimiento=rango_movimiento,
+            tiempo_reaccion_promedio=tiempo_reaccion_promedio,
+            tasa_aciertos=tasa_aciertos,
+            consistencia=consistencia,
+            combo_maximo=combo_maximo,
+            aciertos=aciertos,
+            fallos=fallos
         )
         
         # Guardar en el historial del paciente

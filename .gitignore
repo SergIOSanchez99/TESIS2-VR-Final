@@ -11,7 +11,10 @@ downloads/
 eggs/
 .eggs/
 lib/
+Lib/
 lib64/
+Scripts/
+Include/
 parts/
 sdist/
 var/
@@ -20,6 +23,9 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# Entorno virtual (todas las dependencias están aquí ahora)
+venv/
 
 # Virtual Environment
 .venv/
