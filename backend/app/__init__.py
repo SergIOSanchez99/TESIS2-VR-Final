@@ -2,7 +2,7 @@
 Aplicación Flask Principal - Factory Pattern
 Responsable de crear y configurar la aplicación Flask
 """
-from flask import Flask
+from flask import Flask, request, session
 from flask_cors import CORS
 from flask_session import Session
 import logging
@@ -49,6 +49,9 @@ def create_app(config_name='development'):
     
     # Configurar manejo de errores
     register_error_handlers(app)
+    
+    # Configurar middleware para manejar sesiones corruptas
+    setup_session_middleware(app)
     
     return app
 
@@ -101,6 +104,23 @@ def register_blueprints(app):
     app.register_blueprint(ejercicio_bp, url_prefix='/api/ejercicios')
 
 
+def setup_session_middleware(app):
+    """Configura middleware para manejar sesiones corruptas"""
+    @app.before_request
+    def handle_corrupt_session():
+        """Limpia la sesión si está corrupta"""
+        try:
+            # Intentar acceder a la sesión para detectar si está corrupta
+            _ = session.get('_permanent', False)
+        except (ValueError, TypeError, KeyError) as e:
+            # Si hay un error al leer la sesión (cookie corrupta), limpiarla
+            app.logger.warning(f'Sesión corrupta detectada, limpiando: {str(e)}')
+            try:
+                session.clear()
+            except:
+                pass
+
+
 def register_error_handlers(app):
     """Registra los manejadores de errores"""
     
@@ -114,6 +134,23 @@ def register_error_handlers(app):
     
     @app.errorhandler(400)
     def bad_request_error(error):
+        """Maneja errores 400, incluyendo sesiones corruptas"""
+        # Si el error es por una sesión corrupta, limpiarla
+        try:
+            if hasattr(error, 'description') and 'session' in str(error.description).lower():
+                session.clear()
+                app.logger.warning('Sesión corrupta detectada en error 400, limpiada')
+        except:
+            pass
+        
+        # Si es una petición a la ruta raíz, intentar renderizar el template
+        if request.path == '/':
+            try:
+                from flask import render_template
+                return render_template('index.html')
+            except:
+                pass
+        
         return {'error': 'Solicitud incorrecta'}, 400
     
     @app.errorhandler(401)
