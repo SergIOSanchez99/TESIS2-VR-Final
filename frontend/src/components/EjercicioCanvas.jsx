@@ -94,7 +94,7 @@ const EjercicioCanvas = ({ ejercicioId, nivel, onComplete }) => {
     // Enviar resultado al backend
     try {
       await axios.post(
-        'http://localhost:5000/api/ejercicios/resultado',
+        '/api/ejercicios/resultado',
         {
           ejercicio_id: ejercicioId,
           exito: hits > 0,

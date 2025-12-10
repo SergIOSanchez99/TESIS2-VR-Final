@@ -15,8 +15,8 @@ const Dashboard = () => {
   const loadData = async () => {
     try {
       const [pacienteRes, ejerciciosRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/auth/paciente', { withCredentials: true }),
-        axios.get('http://localhost:5000/api/ejercicios/', { withCredentials: true })
+        axios.get('/api/auth/paciente', { withCredentials: true }),
+        axios.get('/api/ejercicios/', { withCredentials: true })
       ])
 
       if (pacienteRes.data.success) {

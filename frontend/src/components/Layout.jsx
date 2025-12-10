@@ -12,7 +12,7 @@ const Layout = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/auth/paciente', {
+      const response = await axios.get('/api/auth/paciente', {
         withCredentials: true
       })
       if (response.data.success) {
@@ -25,7 +25,7 @@ const Layout = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/auth/logout', {}, {
+      await axios.post('/api/auth/logout', {}, {
         withCredentials: true
       })
       setUser(null)

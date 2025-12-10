@@ -29,7 +29,7 @@ const Ejercicio = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:5000/api/ejercicios/${ejercicioId}`,
+        `/api/ejercicios/${ejercicioId}`,
         { withCredentials: true }
       )
 
