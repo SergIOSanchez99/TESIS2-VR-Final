@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom'
 const Home = () => {
   return (
     <>
-      <section className="hero-section bg-primary text-white py-5">
+      {/* Hero Section */}
+      <section className="hero-section">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-lg-6">
@@ -26,21 +27,15 @@ const Home = () => {
               </div>
             </div>
             <div className="col-lg-6 text-center">
-              <img 
-                src="https://images.unsplash.com/photo-1593508512255-86ab42a8e620?w=600&h=600&fit=crop&q=80" 
-                alt="Realidad Virtual para Rehabilitación" 
-                className="img-fluid rounded-3 shadow-lg"
-                style={{ maxWidth: '100%', height: 'auto', borderRadius: '15px' }}
-                onError={(e) => {
-                  // Si la imagen falla, usar un placeholder
-                  e.target.src = 'https://via.placeholder.com/600x400/667eea/ffffff?text=VR+Rehabilitación'
-                }}
-              />
+              <div className="progress-circle bg-success">
+                <i className="fas fa-heartbeat"></i>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Features Section */}
       <section className="py-5">
         <div className="container">
           <div className="row text-center mb-5">
@@ -98,6 +93,80 @@ const Home = () => {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How it Works Section */}
+      <section className="py-5 bg-light">
+        <div className="container">
+          <div className="row text-center mb-5">
+            <div className="col-12">
+              <h2 className="display-5 fw-bold text-primary">¿Cómo Funciona?</h2>
+              <p className="lead text-muted">
+                Sigue estos simples pasos para comenzar tu rehabilitación
+              </p>
+            </div>
+          </div>
+
+          <div className="row g-4">
+            <div className="col-md-3 text-center">
+              <div className="mb-3">
+                <div className="progress-circle bg-primary">1</div>
+              </div>
+              <h5>Regístrate</h5>
+              <p className="text-muted">
+                Crea tu cuenta de paciente de forma rápida y segura
+              </p>
+            </div>
+
+            <div className="col-md-3 text-center">
+              <div className="mb-3">
+                <div className="progress-circle bg-primary">2</div>
+              </div>
+              <h5>Selecciona Ejercicios</h5>
+              <p className="text-muted">
+                Elige el nivel de dificultad que mejor se adapte a ti
+              </p>
+            </div>
+
+            <div className="col-md-3 text-center">
+              <div className="mb-3">
+                <div className="progress-circle bg-primary">3</div>
+              </div>
+              <h5>Realiza Ejercicios</h5>
+              <p className="text-muted">
+                Completa los ejercicios interactivos con tu mouse
+              </p>
+            </div>
+
+            <div className="col-md-3 text-center">
+              <div className="mb-3">
+                <div className="progress-circle bg-primary">4</div>
+              </div>
+              <h5>Monitorea Progreso</h5>
+              <p className="text-muted">Revisa tu evolución y mejora continua</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-5">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-lg-8 text-center">
+              <h2 className="display-6 fw-bold text-primary mb-4">
+                ¿Listo para comenzar tu rehabilitación?
+              </h2>
+              <p className="lead mb-4">
+                Únete a nuestra comunidad de pacientes y comienza tu camino hacia la
+                recuperación
+              </p>
+              <Link to="/registro" className="btn btn-primary btn-lg">
+                <i className="fas fa-rocket me-2"></i>Comenzar Ahora
+              </Link>
             </div>
           </div>
         </div>
