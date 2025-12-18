@@ -36,13 +36,17 @@ const Layout = ({ children }) => {
   }
 
   return (
-    <div className="min-vh-100 d-flex flex-column">
-      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+    <>
+      {/* Navbar */}
+      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm" style={{ backgroundColor: 'white !important' }}>
         <div className="container">
-          <Link className="navbar-brand" to="/">
-            <i className="fas fa-dumbbell me-2"></i>
+          <Link className="navbar-brand rehavr-logo" to="/">
+            <span className="logo-icon">
+              <span className="logo-h">H</span>
+            </span>
             RehaVR
           </Link>
+
           <button
             className="navbar-toggler"
             type="button"
@@ -51,28 +55,46 @@ const Layout = ({ children }) => {
           >
             <span className="navbar-toggler-icon"></span>
           </button>
+
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
-              {user && (
-                <li className="nav-item">
-                  <button className="btn btn-outline-light btn-sm" onClick={handleLogout}>
-                    Cerrar Sesión
-                  </button>
-                </li>
-              )}
+              {user ? (
+                <>
+                  <li className="nav-item">
+                    <span className="nav-link">
+                      <i className="fas fa-user me-1"></i>{user.nombre}
+                    </span>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/dashboard">
+                      <i className="fas fa-tachometer-alt me-1"></i>Dashboard
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <button className="nav-link btn btn-link text-decoration-none p-0" onClick={handleLogout}>
+                      <i className="fas fa-sign-out-alt me-1"></i>Cerrar Sesión
+                    </button>
+                  </li>
+                </>
+              ) : null}
             </ul>
           </div>
         </div>
       </nav>
-      <main className="flex-grow-1">
-        {children}
-      </main>
-      <footer className="bg-dark text-light py-4 mt-auto">
-        <div className="container text-center">
-          <p className="mb-0">&copy; 2024 RehaVR - Sistema de Rehabilitación Motora</p>
+
+      {/* Main Content */}
+      <main>{children}</main>
+
+      {/* Footer */}
+      <footer className="bg-dark text-white text-center py-4 mt-5">
+        <div className="container">
+          <p className="mb-0">
+            <i className="fas fa-heartbeat me-2"></i>
+            Sistema de Rehabilitación Motora - RehaVR
+          </p>
         </div>
       </footer>
-    </div>
+    </>
   )
 }
 
