@@ -2,27 +2,25 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import EjercicioCanvas from '../components/EjercicioCanvas'
+import TerapiaAbotonarCamisa from '../components/TerapiaAbotonarCamisa'
+import TerapiaArrastrarObjeto from '../components/TerapiaArrastrarObjeto'
+import TerapiaAbrirCerradura from '../components/TerapiaAbrirCerradura'
+import TerapiaUsarCubiertos from '../components/TerapiaUsarCubiertos'
+import TerapiaRompecabezas from '../components/TerapiaRompecabezas'
+import TerapiaClasificarObjetos from '../components/TerapiaClasificarObjetos'
 
 const Ejercicio = () => {
-  const { nivel } = useParams()
+  const { ejercicioId } = useParams()
   const navigate = useNavigate()
   const [ejercicio, setEjercicio] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     loadEjercicio()
-  }, [nivel])
+  }, [ejercicioId])
 
   const loadEjercicio = async () => {
     try {
-      // Mapear nivel a ejercicio_id
-      const ejercicioMap = {
-        '1': 'rehabilitacion_nivel_1',
-        '2': 'rehabilitacion_nivel_2',
-        '3': 'rehabilitacion_nivel_3'
-      }
-
-      const ejercicioId = ejercicioMap[nivel]
       if (!ejercicioId) {
         navigate('/dashboard')
         return
@@ -74,12 +72,73 @@ const Ejercicio = () => {
     )
   }
 
+  // Determinar qué componente usar según el tipo de ejercicio
+  const renderEjercicio = () => {
+    if (ejercicio.tipo === 'terapia_ocupacional') {
+      if (ejercicioId === 'terapia_abotonar_camisa') {
+        return (
+          <TerapiaAbotonarCamisa
+            ejercicioId={ejercicio.id}
+            onComplete={handleComplete}
+          />
+        )
+      } else if (ejercicioId === 'terapia_arrastrar_objeto') {
+        return (
+          <TerapiaArrastrarObjeto
+            ejercicioId={ejercicio.id}
+            onComplete={handleComplete}
+          />
+        )
+      } else if (ejercicioId === 'terapia_abrir_cerradura') {
+        return (
+          <TerapiaAbrirCerradura
+            ejercicioId={ejercicio.id}
+            onComplete={handleComplete}
+          />
+        )
+      } else if (ejercicioId === 'terapia_usar_cubiertos') {
+        return (
+          <TerapiaUsarCubiertos
+            ejercicioId={ejercicio.id}
+            onComplete={handleComplete}
+          />
+        )
+      } else if (ejercicioId === 'terapia_rompecabezas') {
+        return (
+          <TerapiaRompecabezas
+            ejercicioId={ejercicio.id}
+            onComplete={handleComplete}
+          />
+        )
+      } else if (ejercicioId === 'terapia_clasificar_objetos') {
+        return (
+          <TerapiaClasificarObjetos
+            ejercicioId={ejercicio.id}
+            onComplete={handleComplete}
+          />
+        )
+      }
+    }
+    
+    // Ejercicios de rehabilitación
+    return (
+      <EjercicioCanvas
+        ejercicioId={ejercicio.id}
+        nivel={ejercicio.nivel || 1}
+        onComplete={handleComplete}
+      />
+    )
+  }
+
   return (
     <div className="container py-5">
-      <div className="card shadow">
-        <div className="card-header bg-primary text-white">
+      <div className="card shadow-lg" style={{ borderRadius: '15px' }}>
+        <div className={`card-header text-white ${ejercicio.tipo === 'terapia_ocupacional' ? 'bg-accent' : 'bg-primary'}`} style={{ 
+          backgroundColor: ejercicio.tipo === 'terapia_ocupacional' ? 'var(--accent-color)' : undefined,
+          borderRadius: '15px 15px 0 0'
+        }}>
           <h2 className="mb-0">
-            <i className="fas fa-gamepad me-2"></i>
+            <i className={`fas ${ejercicio.tipo === 'terapia_ocupacional' ? 'fa-hands-helping' : 'fa-gamepad'} me-2`}></i>
             {ejercicio.nombre}
           </h2>
         </div>
@@ -87,26 +146,25 @@ const Ejercicio = () => {
           <p className="lead">{ejercicio.descripcion}</p>
           
           {ejercicio.instrucciones && ejercicio.instrucciones.length > 0 && (
-            <div className="alert alert-info">
-              <h5 className="alert-heading">Instrucciones:</h5>
+            <div className="alert alert-info" style={{ borderRadius: '10px' }}>
+              <h5 className="alert-heading">
+                <i className="fas fa-info-circle me-2"></i>Instrucciones:
+              </h5>
               <ul className="mb-0">
                 {ejercicio.instrucciones.map((inst, index) => (
-                  <li key={index}>{inst}</li>
+                  <li key={index} style={{ marginBottom: '5px' }}>{inst}</li>
                 ))}
               </ul>
             </div>
           )}
 
-          <EjercicioCanvas
-            ejercicioId={ejercicio.id}
-            nivel={parseInt(nivel)}
-            onComplete={handleComplete}
-          />
+          {renderEjercicio()}
 
           <div className="mt-4 text-center">
             <button
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-lg"
               onClick={() => navigate('/dashboard')}
+              style={{ borderRadius: '25px', padding: '10px 30px' }}
             >
               <i className="fas fa-arrow-left me-2"></i>Volver al Dashboard
             </button>
