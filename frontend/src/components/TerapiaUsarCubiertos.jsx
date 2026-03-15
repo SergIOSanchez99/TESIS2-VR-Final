@@ -146,7 +146,6 @@ const TerapiaUsarCubiertos = ({ ejercicioId, onComplete }) => {
                 position: 'absolute',
                 left: `${food.x}%`,
                 top: `${food.y}%`,
-                transform: 'translate(-50%, -50%)',
                 width: '120px',
                 height: '120px',
                 background: food.completed

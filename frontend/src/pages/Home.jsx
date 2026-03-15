@@ -99,55 +99,43 @@ const Home = () => {
       </section>
 
       {/* How it Works Section */}
-      <section className="py-5 bg-light">
+      <section className="py-5" style={{ background: 'var(--rv-bg-2)' }}>
         <div className="container">
           <div className="row text-center mb-5">
             <div className="col-12">
-              <h2 className="display-5 fw-bold text-primary">¿Cómo Funciona?</h2>
-              <p className="lead text-muted">
+              <h2 className="display-5 fw-bold" style={{ color: 'var(--rv-cyan)' }}>¿Cómo Funciona?</h2>
+              <p className="lead" style={{ color: 'var(--rv-text-muted)' }}>
                 Sigue estos simples pasos para comenzar tu rehabilitación
               </p>
             </div>
           </div>
 
           <div className="row g-4">
-            <div className="col-md-3 text-center">
-              <div className="mb-3">
-                <div className="progress-circle bg-primary">1</div>
+            {[
+              { num: '1', titulo: 'Regístrate',          desc: 'Crea tu cuenta de paciente de forma rápida y segura' },
+              { num: '2', titulo: 'Selecciona Ejercicios', desc: 'Elige el nivel de dificultad que mejor se adapte a ti' },
+              { num: '3', titulo: 'Realiza Ejercicios',   desc: 'Completa los ejercicios interactivos con tu mouse' },
+              { num: '4', titulo: 'Monitorea Progreso',   desc: 'Revisa tu evolución y mejora continua' },
+            ].map(({ num, titulo, desc }) => (
+              <div key={num} className="col-md-3 text-center">
+                <div className="mb-3">
+                  <div
+                    className="progress-circle"
+                    style={{
+                      background: 'linear-gradient(135deg, var(--rv-cyan), #0077a8)',
+                      boxShadow: '0 0 20px var(--rv-cyan-glow)',
+                      color: '#fff',
+                      fontSize: '1.4rem',
+                      fontWeight: 800,
+                    }}
+                  >
+                    {num}
+                  </div>
+                </div>
+                <h5 style={{ color: 'var(--rv-text)', fontWeight: 700 }}>{titulo}</h5>
+                <p style={{ color: 'var(--rv-text-muted)' }}>{desc}</p>
               </div>
-              <h5>Regístrate</h5>
-              <p className="text-muted">
-                Crea tu cuenta de paciente de forma rápida y segura
-              </p>
-            </div>
-
-            <div className="col-md-3 text-center">
-              <div className="mb-3">
-                <div className="progress-circle bg-primary">2</div>
-              </div>
-              <h5>Selecciona Ejercicios</h5>
-              <p className="text-muted">
-                Elige el nivel de dificultad que mejor se adapte a ti
-              </p>
-            </div>
-
-            <div className="col-md-3 text-center">
-              <div className="mb-3">
-                <div className="progress-circle bg-primary">3</div>
-              </div>
-              <h5>Realiza Ejercicios</h5>
-              <p className="text-muted">
-                Completa los ejercicios interactivos con tu mouse
-              </p>
-            </div>
-
-            <div className="col-md-3 text-center">
-              <div className="mb-3">
-                <div className="progress-circle bg-primary">4</div>
-              </div>
-              <h5>Monitorea Progreso</h5>
-              <p className="text-muted">Revisa tu evolución y mejora continua</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -157,7 +145,7 @@ const Home = () => {
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-lg-8 text-center">
-              <h2 className="display-6 fw-bold text-primary mb-4">
+              <h2 className="display-6 fw-bold mb-4" style={{ color: 'var(--rv-text)' }}>
                 ¿Listo para comenzar tu rehabilitación?
               </h2>
               <p className="lead mb-4">

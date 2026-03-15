@@ -230,7 +230,6 @@ const TerapiaClasificarObjetos = ({ ejercicioId, onComplete }) => {
                 position: 'absolute',
                 left: `${object.x}%`,
                 top: `${object.y}%`,
-                transform: 'translate(-50%, -50%)',
                 width: '70px',
                 height: '70px',
                 background: object.completed
