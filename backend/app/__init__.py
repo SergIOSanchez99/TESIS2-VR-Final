@@ -98,10 +98,18 @@ def setup_logging(app):
 def register_blueprints(app):
     """Registra los blueprints de la aplicación"""
     from .routes import auth_bp, ejercicio_bp, main_bp
+    from .controllers.configuracion_controller import configuracion_bp
+    from .controllers.gamificacion_controller import gamificacion_bp
+    from .controllers.sesion_controller import sesion_bp
+    from .controllers.reporte_controller import reporte_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(ejercicio_bp, url_prefix='/api/ejercicios')
+    app.register_blueprint(configuracion_bp, url_prefix='/api')
+    app.register_blueprint(gamificacion_bp, url_prefix='/api')
+    app.register_blueprint(sesion_bp, url_prefix='/api')
+    app.register_blueprint(reporte_bp, url_prefix='/api')
 
 
 def setup_session_middleware(app):

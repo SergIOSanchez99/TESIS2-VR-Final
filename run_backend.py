@@ -59,25 +59,27 @@ def setup_environment():
         'FLASK_ENV': 'development',
         'FLASK_DEBUG': 'True',
         'SECRET_KEY': 'rehavr_secret_key_2024',
-        'DATA_PATH': 'data/pacientes',
-        'FLASK_PORT': '5000'  # Puerto 5000 por defecto
+        'DATA_PATH': 'data/pacientes',         # relativo a backend/
+        'HISTORIAL_PATH': 'data/pacientes/historial',  # relativo a backend/
+        'FLASK_PORT': '5000'
     }
-    
+
     for key, value in env_vars.items():
         os.environ[key] = value
-    
+
     print("🔧 Variables de entorno configuradas")
 
 def create_directories():
     """Crea los directorios necesarios"""
     directories = [
-        "data/pacientes/historial",
+        "backend/data/pacientes/historial",
+        "data/sessions",
         "logs"
     ]
-    
+
     for directory in directories:
         Path(directory).mkdir(parents=True, exist_ok=True)
-    
+
     print("📁 Directorios creados/verificados")
 
 def run_backend():

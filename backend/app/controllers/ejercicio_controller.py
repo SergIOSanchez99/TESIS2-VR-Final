@@ -103,13 +103,14 @@ class EjercicioController:
             if not data:
                 return jsonify({'error': 'Datos requeridos'}), 400
             
-            ejercicio_id = data.get('ejercicio_id') or data.get('nivel')
+            # Bug fix: nivel es siempre un int; ejercicio_id debe ser string
+            ejercicio_id = str(data.get('ejercicio_id') or data.get('nivel') or '')
             exito = data.get('exito', False)
             tiempo_ejecucion = data.get('tiempo_ejecucion') or data.get('duracion')
             puntuacion = data.get('puntuacion')
             observaciones = data.get('observaciones')
             nivel = data.get('nivel')
-            
+
             # Métricas médicas avanzadas
             precision = data.get('precision')
             velocidad_promedio = data.get('velocidad_promedio')
@@ -120,13 +121,15 @@ class EjercicioController:
             combo_maximo = data.get('combo_maximo')
             aciertos = data.get('aciertos')
             fallos = data.get('fallos')
-            
+
             if not ejercicio_id:
                 return jsonify({'error': 'ID de ejercicio requerido'}), 400
-            
-            # Crear objeto paciente
+
+            # Bug fix: session guarda to_dict_safe() sin 'password'; se inyecta vacío
+            # para que el constructor de Paciente no falle por campo obligatorio.
             from ..models.paciente import Paciente
-            paciente = Paciente.from_dict(paciente_data)
+            safe_data = {**paciente_data, 'password': paciente_data.get('password', '')}
+            paciente = Paciente.from_dict(safe_data)
             
             # Registrar resultado con métricas avanzadas
             resultado = self.ejercicio_service.registrar_resultado(

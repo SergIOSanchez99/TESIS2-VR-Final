@@ -257,6 +257,10 @@ class EjercicioService:
             'ultima_actividad': ultima_actividad
         }
     
+    def obtener_historial_paciente(self, paciente_id: str):
+        """Obtiene el historial completo de ejercicios de un paciente"""
+        return self.ejercicio_repo.obtener_historial(paciente_id)
+
     def obtener_recomendacion_ejercicio(self, paciente_id: str) -> Optional[Ejercicio]:
         """Obtiene una recomendación de ejercicio basada en el historial del paciente"""
         historial = self.ejercicio_repo.obtener_historial(paciente_id)
