@@ -73,7 +73,7 @@ class EjercicioService:
             Ejercicio(
                 id="terapia_abotonar_camisa",
                 nombre="Abotonar Camisa",
-                descripcion="Simulación de abotonar una camisa",
+                descripcion="Ejercicio de coordinación fina para mejorar la destreza manual y la precisión en movimientos pequeños.",
                 tipo=TipoEjercicio.TERAPIA_OCUPACIONAL,
                 nivel=NivelDificultad.PRINCIPIANTE,
                 instrucciones=[
@@ -88,17 +88,79 @@ class EjercicioService:
             ),
             Ejercicio(
                 id="terapia_arrastrar_objeto",
-                nombre="Arrastrar y Soltar Objeto",
-                descripcion="Simulación de arrastrar y soltar objetos",
+                nombre="Arrastrar y Soltar",
+                descripcion="Ejercicio de coordinación mano-ojo para mejorar la capacidad de manipulación de objetos.",
                 tipo=TipoEjercicio.TERAPIA_OCUPACIONAL,
                 nivel=NivelDificultad.INTERMEDIO,
                 instrucciones=[
-                    "Arrastra la cuchara al círculo verde",
+                    "Arrastra cada objeto a su área de destino correspondiente",
                     "Mantén el control durante el arrastre",
                     "Practica la precisión en el posicionamiento"
                 ],
                 parametros={
                     "tamaño_objetivo": 60,
+                    "tiempo_limite": None
+                }
+            ),
+            Ejercicio(
+                id="terapia_abrir_cerradura",
+                nombre="Abrir Cerradura",
+                descripcion="Ejercicio de motricidad fina para mejorar la destreza en tareas de precisión como usar llaves.",
+                tipo=TipoEjercicio.TERAPIA_OCUPACIONAL,
+                nivel=NivelDificultad.INTERMEDIO,
+                instrucciones=[
+                    "Inserta la llave en la cerradura",
+                    "Gira la llave en la dirección correcta",
+                    "Practica la coordinación y precisión"
+                ],
+                parametros={
+                    "tiempo_limite": None
+                }
+            ),
+            Ejercicio(
+                id="terapia_usar_cubiertos",
+                nombre="Usar Cubiertos",
+                descripcion="Simulación de uso de cubiertos para mejorar la coordinación y habilidades de alimentación independiente.",
+                tipo=TipoEjercicio.TERAPIA_OCUPACIONAL,
+                nivel=NivelDificultad.INTERMEDIO,
+                instrucciones=[
+                    "Simula el uso de cubiertos para comer",
+                    "Practica la coordinación mano-ojo",
+                    "Mejora las habilidades de alimentación"
+                ],
+                parametros={
+                    "tiempo_limite": None
+                }
+            ),
+            Ejercicio(
+                id="terapia_rompecabezas",
+                nombre="Rompecabezas",
+                descripcion="Ejercicio de organización espacial y resolución de problemas para mejorar la función cognitiva y motora.",
+                tipo=TipoEjercicio.TERAPIA_OCUPACIONAL,
+                nivel=NivelDificultad.AVANZADO,
+                instrucciones=[
+                    "Arma el rompecabezas arrastrando las piezas",
+                    "Observa la imagen completa",
+                    "Practica la organización espacial"
+                ],
+                parametros={
+                    "numero_piezas": 9,
+                    "tiempo_limite": None
+                }
+            ),
+            Ejercicio(
+                id="terapia_clasificar_objetos",
+                nombre="Clasificar Objetos",
+                descripcion="Ejercicio de organización y categorización para mejorar habilidades de planificación y ejecución.",
+                tipo=TipoEjercicio.TERAPIA_OCUPACIONAL,
+                nivel=NivelDificultad.INTERMEDIO,
+                instrucciones=[
+                    "Clasifica los objetos en sus categorías correspondientes",
+                    "Observa las características de cada objeto",
+                    "Practica la organización y planificación"
+                ],
+                parametros={
+                    "numero_categorias": 3,
                     "tiempo_limite": None
                 }
             )
@@ -135,10 +197,30 @@ class EjercicioService:
     def registrar_resultado(self, paciente: Paciente, ejercicio_id: str, exito: bool,
                           tiempo_ejecucion: Optional[float] = None,
                           puntuacion: Optional[int] = None,
-                          observaciones: Optional[str] = None):
-        """Registra el resultado de un ejercicio"""
+                          observaciones: Optional[str] = None,
+                          precision: Optional[float] = None,
+                          velocidad_promedio: Optional[float] = None,
+                          rango_movimiento: Optional[float] = None,
+                          tiempo_reaccion_promedio: Optional[float] = None,
+                          tasa_aciertos: Optional[float] = None,
+                          consistencia: Optional[float] = None,
+                          combo_maximo: Optional[int] = None,
+                          aciertos: Optional[int] = None,
+                          fallos: Optional[int] = None,
+                          nivel: Optional[int] = None):
+        """Registra el resultado de un ejercicio con métricas médicas avanzadas"""
         return self.ejercicio_repo.registrar_resultado(
-            paciente.id, ejercicio_id, exito, tiempo_ejecucion, puntuacion, observaciones
+            paciente.id, ejercicio_id, exito, tiempo_ejecucion, puntuacion, observaciones,
+            precision=precision,
+            velocidad_promedio=velocidad_promedio,
+            rango_movimiento=rango_movimiento,
+            tiempo_reaccion_promedio=tiempo_reaccion_promedio,
+            tasa_aciertos=tasa_aciertos,
+            consistencia=consistencia,
+            combo_maximo=combo_maximo,
+            aciertos=aciertos,
+            fallos=fallos,
+            nivel=nivel
         )
     
     def obtener_estadisticas_ejercicio(self, paciente_id: str, ejercicio_id: str) -> Dict:
@@ -175,6 +257,10 @@ class EjercicioService:
             'ultima_actividad': ultima_actividad
         }
     
+    def obtener_historial_paciente(self, paciente_id: str):
+        """Obtiene el historial completo de ejercicios de un paciente"""
+        return self.ejercicio_repo.obtener_historial(paciente_id)
+
     def obtener_recomendacion_ejercicio(self, paciente_id: str) -> Optional[Ejercicio]:
         """Obtiene una recomendación de ejercicio basada en el historial del paciente"""
         historial = self.ejercicio_repo.obtener_historial(paciente_id)

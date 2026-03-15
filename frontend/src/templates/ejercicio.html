@@ -12,24 +12,84 @@
     border: 2px solid #1976d2;
     border-radius: 10px;
     cursor: crosshair;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   }
 
   .game-info {
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 10px;
     padding: 1rem;
     margin-bottom: 1rem;
+    color: white;
   }
 
   .timer {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #1976d2;
+    color: #fff;
   }
 
   .score {
     font-size: 1.2rem;
-    color: #43a047;
+    color: #fff;
+  }
+
+  .metrics-panel {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .metric-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .metric-label {
+    font-weight: 600;
+    color: #495057;
+  }
+
+  .metric-value {
+    color: #1976d2;
+    font-weight: bold;
+  }
+
+  .progress-ring {
+    transform: rotate(-90deg);
+  }
+
+  .hit-effect {
+    position: absolute;
+    pointer-events: none;
+    animation: hitPulse 0.6s ease-out;
+  }
+
+  @keyframes hitPulse {
+    0% {
+      transform: scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(3);
+      opacity: 0;
+    }
+  }
+
+  .combo-indicator {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 193, 7, 0.9);
+    color: #000;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    display: none;
   }
 </style>
 {% endblock %} {% block content %}
@@ -52,26 +112,65 @@
 
         <div class="game-info">
           <div class="row text-center">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="timer" id="timer">Tiempo: 60s</div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="score" id="score">Puntos: 0</div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="score" id="hits">Aciertos: 0</div>
+            </div>
+            <div class="col-md-3">
+              <div class="score" id="precision">Precisión: 0%</div>
             </div>
           </div>
         </div>
 
-        <div class="text-center mb-3">
-          <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <div class="text-center mb-3" style="position: relative">
+          <canvas id="gameCanvas" width="800" height="500"></canvas>
+          <div class="combo-indicator" id="comboIndicator">
+            Combo x<span id="comboCount">0</span>!
+          </div>
+        </div>
+
+        <div class="metrics-panel">
+          <h5 class="mb-3">
+            <i class="fas fa-chart-line me-2"></i>Métricas de Rehabilitación
+          </h5>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="metric-item">
+                <span class="metric-label">Velocidad Promedio:</span>
+                <span class="metric-value" id="avgSpeed">0 px/s</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Rango de Movimiento:</span>
+                <span class="metric-value" id="movementRange">0 px</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Tiempo de Reacción:</span>
+                <span class="metric-value" id="reactionTime">0 ms</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="metric-item">
+                <span class="metric-label">Tasa de Aciertos:</span>
+                <span class="metric-value" id="hitRate">0%</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Consistencia:</span>
+                <span class="metric-value" id="consistency">0%</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Combo Máximo:</span>
+                <span class="metric-value" id="maxCombo">0</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="text-center">
-          <button id="startBtn" class="btn btn-primary btn-lg me-2">
-            <i class="fas fa-play me-2"></i>Comenzar
-          </button>
           <button
             id="pauseBtn"
             class="btn btn-warning btn-lg me-2"
@@ -80,7 +179,7 @@
             <i class="fas fa-pause me-2"></i>Pausar
           </button>
           <a
-            href="{{ url_for('dashboard') }}"
+            href="{{ url_for('main.dashboard') }}"
             class="btn btn-outline-secondary btn-lg"
           >
             <i class="fas fa-arrow-left me-2"></i>Volver
@@ -124,191 +223,631 @@
 <script>
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
-  const startBtn = document.getElementById('startBtn');
   const pauseBtn = document.getElementById('pauseBtn');
   const timerElement = document.getElementById('timer');
   const scoreElement = document.getElementById('score');
   const hitsElement = document.getElementById('hits');
+  const precisionElement = document.getElementById('precision');
+  const comboIndicator = document.getElementById('comboIndicator');
+  const comboCount = document.getElementById('comboCount');
 
+  // Get nivel from template first
+  const nivel = {{ nivel }};
+
+  // Game state
   let gameRunning = false;
   let gamePaused = false;
   let timeLeft = 60;
   let score = 0;
   let hits = 0;
-  let target = { x: 0, y: 0, size: 30 };
+  let misses = 0;
+  let combo = 0;
+  let maxCombo = 0;
+  let lastHitTime = 0;
+
+  // Target properties
+  let target = {
+    x: 0,
+    y: 0,
+    size: nivel === 1 ? 40 : nivel === 2 ? 35 : 30,
+    vx: 0,
+    vy: 0,
+    color: '#1976d2',
+    pulse: 0
+  };
+
+  // Metrics tracking
+  let metrics = {
+    totalClicks: 0,
+    totalDistance: 0,
+    reactionTimes: [],
+    movementHistory: [],
+    lastClickPos: { x: 0, y: 0 },
+    startTime: 0,
+    minX: Infinity,
+    maxX: -Infinity,
+    minY: Infinity,
+    maxY: -Infinity
+  };
+
   let gameInterval;
   let timerInterval;
+  let animationFrame;
+  let preGameAnimationFrame;
+  let particles = [];
 
-  const nivel = {{ nivel }};
-
+  // Initialize game
   function initGame() {
-      // Reset game state
-      timeLeft = 60;
-      score = 0;
-      hits = 0;
-      gameRunning = false;
-      gamePaused = false;
+    timeLeft = 60;
+    score = 0;
+    hits = 0;
+    misses = 0;
+    combo = 0;
+    maxCombo = 0;
+    gameRunning = false;
+    gamePaused = false;
+    particles = [];
+
+    metrics = {
+      totalClicks: 0,
+      totalDistance: 0,
+      reactionTimes: [],
+      movementHistory: [],
+      lastClickPos: { x: 0, y: 0 },
+      startTime: 0,
+      minX: Infinity,
+      maxX: -Infinity,
+      minY: Infinity,
+      maxY: -Infinity
+    };
+
+    // Initialize target position
+    target.x = canvas.width / 2;
+    target.y = canvas.height / 2;
+
+    // Set initial velocity based on level
+    if (nivel === 2) {
+      target.vx = (Math.random() - 0.5) * 2;
+      target.vy = (Math.random() - 0.5) * 2;
+    } else if (nivel === 3) {
+      target.vx = (Math.random() - 0.5) * 5;
+      target.vy = (Math.random() - 0.5) * 5;
+    }
+
+    updateDisplay();
+
+    // Start drawing loop immediately so target is visible
+    function drawLoop() {
+      if (!gameRunning) {
+        moveTarget(); // Update position even if game not started (for levels 2 and 3)
+        drawGame();
+        preGameAnimationFrame = requestAnimationFrame(drawLoop);
+      }
+    }
+    drawLoop();
+  }
+
+  // Draw game with improved graphics
+  function drawGame() {
+    // Clear canvas with gradient background
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#f5f7fa');
+    gradient.addColorStop(1, '#c3cfe2');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid pattern for depth
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < canvas.width; i += 50) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, canvas.height);
+      ctx.stroke();
+    }
+    for (let i = 0; i < canvas.height; i += 50) {
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(canvas.width, i);
+      ctx.stroke();
+    }
+
+    // Draw target with pulsing effect
+    target.pulse += 0.1;
+    const pulseSize = target.size + Math.sin(target.pulse) * 3;
+
+    // Outer glow
+    const glowGradient = ctx.createRadialGradient(
+      target.x, target.y, 0,
+      target.x, target.y, pulseSize + 10
+    );
+    glowGradient.addColorStop(0, 'rgba(25, 118, 210, 0.3)');
+    glowGradient.addColorStop(1, 'rgba(25, 118, 210, 0)');
+    ctx.fillStyle = glowGradient;
+    ctx.beginPath();
+    ctx.arc(target.x, target.y, pulseSize + 10, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Target circle
+    ctx.fillStyle = target.color;
+    ctx.beginPath();
+    ctx.arc(target.x, target.y, pulseSize, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Target rings
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(target.x, target.y, pulseSize, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#1976d2';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(target.x, target.y, pulseSize * 0.6, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    // Center dot
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(target.x, target.y, 5, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Draw particles
+    particles.forEach((particle, index) => {
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      particle.life -= 0.02;
+      particle.size *= 0.98;
+
+      if (particle.life <= 0) {
+        particles.splice(index, 1);
+        return;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = particle.life;
+      ctx.fillStyle = particle.color;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.size, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Draw cursor trail
+    if (metrics.movementHistory.length > 0) {
+      ctx.strokeStyle = 'rgba(25, 118, 210, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(metrics.movementHistory[0].x, metrics.movementHistory[0].y);
+      for (let i = 1; i < metrics.movementHistory.length; i++) {
+        ctx.lineTo(metrics.movementHistory[i].x, metrics.movementHistory[i].y);
+      }
+      ctx.stroke();
+    }
+  }
+
+  // Move target with improved physics
+  function moveTarget() {
+    if (nivel === 1) {
+      // Static target - still update pulse for animation
+      return;
+    }
+
+    const margin = target.size;
+    const bounceDamping = 0.8;
+
+    // Update position
+    target.x += target.vx;
+    target.y += target.vy;
+
+    // Bounce off walls
+    if (target.x <= margin || target.x >= canvas.width - margin) {
+      target.vx *= -bounceDamping;
+      target.x = Math.max(margin, Math.min(canvas.width - margin, target.x));
+
+      // Add some randomness for level 3
+      if (nivel === 3) {
+        target.vy += (Math.random() - 0.5) * 2;
+      }
+    }
+
+    if (target.y <= margin || target.y >= canvas.height - margin) {
+      target.vy *= -bounceDamping;
+      target.y = Math.max(margin, Math.min(canvas.height - margin, target.y));
+
+      if (nivel === 3) {
+        target.vx += (Math.random() - 0.5) * 2;
+      }
+    }
+
+    // For level 3, add acceleration and direction changes
+    if (nivel === 3) {
+      if (Math.random() < 0.02) {
+        target.vx += (Math.random() - 0.5) * 3;
+        target.vy += (Math.random() - 0.5) * 3;
+      }
+
+      // Limit max speed
+      const maxSpeed = 8;
+      const speed = Math.sqrt(target.vx * target.vx + target.vy * target.vy);
+      if (speed > maxSpeed) {
+        target.vx = (target.vx / speed) * maxSpeed;
+        target.vy = (target.vy / speed) * maxSpeed;
+      }
+    }
+
+    // Track movement range
+    metrics.minX = Math.min(metrics.minX, target.x);
+    metrics.maxX = Math.max(metrics.maxX, target.x);
+    metrics.minY = Math.min(metrics.minY, target.y);
+    metrics.maxY = Math.max(metrics.maxY, target.y);
+  }
+
+  // Create particle effect
+  function createParticles(x, y, color) {
+    for (let i = 0; i < 15; i++) {
+      particles.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 8,
+        vy: (Math.random() - 0.5) * 8,
+        size: Math.random() * 5 + 2,
+        life: 1,
+        color: color
+      });
+    }
+  }
+
+  // Check hit with improved detection
+  function checkHit(mouseX, mouseY) {
+    metrics.totalClicks++;
+    const distance = Math.sqrt(
+      Math.pow(mouseX - target.x, 2) + Math.pow(mouseY - target.y, 2)
+    );
+
+    // Track movement
+    const clickDistance = Math.sqrt(
+      Math.pow(mouseX - metrics.lastClickPos.x, 2) +
+      Math.pow(mouseY - metrics.lastClickPos.y, 2)
+    );
+    metrics.totalDistance += clickDistance;
+    metrics.lastClickPos = { x: mouseX, y: mouseY };
+    metrics.movementHistory.push({ x: mouseX, y: mouseY });
+    if (metrics.movementHistory.length > 50) {
+      metrics.movementHistory.shift();
+    }
+
+    if (distance <= target.size) {
+      hits++;
+      combo++;
+      maxCombo = Math.max(maxCombo, combo);
+
+      // Calculate reaction time
+      const currentTime = Date.now();
+      if (lastHitTime > 0) {
+        const reactionTime = currentTime - lastHitTime;
+        metrics.reactionTimes.push(reactionTime);
+      }
+      lastHitTime = currentTime;
+
+      // Score calculation with combo multiplier
+      const baseScore = nivel * 10;
+      const comboMultiplier = 1 + (combo * 0.1);
+      score += Math.floor(baseScore * comboMultiplier);
+
+      // Show combo indicator
+      if (combo > 2) {
+        comboCount.textContent = combo;
+        comboIndicator.style.display = 'block';
+        setTimeout(() => {
+          comboIndicator.style.display = 'none';
+        }, 1000);
+      }
+
+      // Create hit effect
+      createParticles(target.x, target.y, '#43a047');
+      target.color = '#43a047';
+      setTimeout(() => {
+        target.color = '#1976d2';
+      }, 200);
+
+      // Move target to new position
+      target.x = Math.random() * (canvas.width - 2 * target.size) + target.size;
+      target.y = Math.random() * (canvas.height - 2 * target.size) + target.size;
+
+      // Reset velocity for moving targets
+      if (nivel === 2) {
+        target.vx = (Math.random() - 0.5) * 2;
+        target.vy = (Math.random() - 0.5) * 2;
+      } else if (nivel === 3) {
+        target.vx = (Math.random() - 0.5) * 5;
+        target.vy = (Math.random() - 0.5) * 5;
+      }
 
       updateDisplay();
-      drawTarget();
-  }
-
-  function drawTarget() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw target
-      ctx.fillStyle = '#1976d2';
-      ctx.beginPath();
-      ctx.arc(target.x, target.y, target.size, 0, 2 * Math.PI);
-      ctx.fill();
-
-      // Draw target border
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-  }
-
-  function moveTarget() {
-      if (nivel === 1) {
-          // Static target - no movement
-          return;
-      }
-
-      const speed = nivel === 2 ? 2 : 4;
-      const margin = target.size;
-
-      // Move target
-      target.x += (Math.random() - 0.5) * speed;
-      target.y += (Math.random() - 0.5) * speed;
-
-      // Keep target within bounds
-      target.x = Math.max(margin, Math.min(canvas.width - margin, target.x));
-      target.y = Math.max(margin, Math.min(canvas.height - margin, target.y));
-  }
-
-  function checkHit(mouseX, mouseY) {
-      const distance = Math.sqrt(
-          Math.pow(mouseX - target.x, 2) + Math.pow(mouseY - target.y, 2)
-      );
-
-      if (distance <= target.size) {
-          hits++;
-          score += nivel * 10;
-
-          // Move target to new random position
-          target.x = Math.random() * (canvas.width - 2 * target.size) + target.size;
-          target.y = Math.random() * (canvas.height - 2 * target.size) + target.size;
-
-          updateDisplay();
-          return true;
-      }
-
+      updateMetrics();
+      return true;
+    } else {
+      misses++;
+      combo = 0;
+      createParticles(mouseX, mouseY, '#dc3545');
+      updateDisplay();
+      updateMetrics();
       return false;
+    }
   }
 
+  // Update display
   function updateDisplay() {
-      timerElement.textContent = `Tiempo: ${timeLeft}s`;
-      scoreElement.textContent = `Puntos: ${score}`;
-      hitsElement.textContent = `Aciertos: ${hits}`;
+    timerElement.textContent = `Tiempo: ${timeLeft}s`;
+    scoreElement.textContent = `Puntos: ${score}`;
+    hitsElement.textContent = `Aciertos: ${hits}`;
+
+    const totalAttempts = hits + misses;
+    const precision = totalAttempts > 0 ? ((hits / totalAttempts) * 100).toFixed(1) : 0;
+    precisionElement.textContent = `Precisión: ${precision}%`;
   }
 
+  // Update metrics panel
+  function updateMetrics() {
+    const totalAttempts = hits + misses;
+    const hitRate = totalAttempts > 0 ? ((hits / totalAttempts) * 100).toFixed(1) : 0;
+
+    // Average speed
+    const elapsed = (Date.now() - metrics.startTime) / 1000;
+    const avgSpeed = elapsed > 0 ? (metrics.totalDistance / elapsed).toFixed(1) : 0;
+
+    // Movement range
+    const rangeX = metrics.maxX !== -Infinity ? (metrics.maxX - metrics.minX).toFixed(0) : 0;
+    const rangeY = metrics.maxY !== -Infinity ? (metrics.maxY - metrics.minY).toFixed(0) : 0;
+    const movementRange = Math.max(rangeX, rangeY);
+
+    // Average reaction time
+    const avgReactionTime = metrics.reactionTimes.length > 0
+      ? (metrics.reactionTimes.reduce((a, b) => a + b, 0) / metrics.reactionTimes.length).toFixed(0)
+      : 0;
+
+    // Consistency (based on reaction time variance)
+    let consistency = 100;
+    if (metrics.reactionTimes.length > 1) {
+      const avg = metrics.reactionTimes.reduce((a, b) => a + b, 0) / metrics.reactionTimes.length;
+      const variance = metrics.reactionTimes.reduce((sum, rt) => sum + Math.pow(rt - avg, 2), 0) / metrics.reactionTimes.length;
+      const stdDev = Math.sqrt(variance);
+      consistency = Math.max(0, 100 - (stdDev / avg * 100));
+    }
+
+    document.getElementById('avgSpeed').textContent = `${avgSpeed} px/s`;
+    document.getElementById('movementRange').textContent = `${movementRange} px`;
+    document.getElementById('reactionTime').textContent = `${avgReactionTime} ms`;
+    document.getElementById('hitRate').textContent = `${hitRate}%`;
+    document.getElementById('consistency').textContent = `${consistency.toFixed(1)}%`;
+    document.getElementById('maxCombo').textContent = maxCombo;
+  }
+
+  // Start game - Auto-start since user already clicked "Comenzar" in dashboard
   function startGame() {
-      if (gameRunning) return;
+    if (gameRunning) return;
 
-      gameRunning = true;
-      startBtn.style.display = 'none';
-      pauseBtn.style.display = 'inline-block';
+    // Cancel pre-game animation loop
+    if (preGameAnimationFrame) {
+      cancelAnimationFrame(preGameAnimationFrame);
+    }
 
-      // Start timer
-      timerInterval = setInterval(() => {
-          if (!gamePaused) {
-              timeLeft--;
-              updateDisplay();
+    gameRunning = true;
+    metrics.startTime = Date.now();
+    pauseBtn.style.display = 'inline-block';
 
-              if (timeLeft <= 0) {
-                  endGame();
-              }
-          }
-      }, 1000);
+    // Start timer
+    timerInterval = setInterval(() => {
+      if (!gamePaused) {
+        timeLeft--;
+        updateDisplay();
 
-      // Start game loop
-      gameInterval = setInterval(() => {
-          if (!gamePaused) {
-              moveTarget();
-              drawTarget();
-          }
-      }, 50);
-  }
-
-  function pauseGame() {
-      gamePaused = !gamePaused;
-      pauseBtn.innerHTML = gamePaused ?
-          '<i class="fas fa-play me-2"></i>Continuar' :
-          '<i class="fas fa-pause me-2"></i>Pausar';
-  }
-
-  function endGame() {
-      clearInterval(gameInterval);
-      clearInterval(timerInterval);
-      gameRunning = false;
-
-      // Calculate success based on hits and score
-      const success = hits >= (nivel * 3) && score >= (nivel * 50);
-
-      // Send result to server
-      fetch('/api/registrar_resultado', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              nivel: nivel,
-              exito: success
-          })
-      });
-
-      // Show result modal
-      const modal = new bootstrap.Modal(document.getElementById('resultModal'));
-      const resultContent = document.getElementById('resultContent');
-
-      if (success) {
-          resultContent.innerHTML = `
-              <div class="text-success mb-3">
-                  <i class="fas fa-trophy fa-3x"></i>
-              </div>
-              <h4 class="text-success">¡Excelente trabajo!</h4>
-              <p>Has completado el ejercicio con éxito.</p>
-              <p><strong>Puntos:</strong> ${score} | <strong>Aciertos:</strong> ${hits}</p>
-          `;
-      } else {
-          resultContent.innerHTML = `
-              <div class="text-warning mb-3">
-                  <i class="fas fa-exclamation-triangle fa-3x"></i>
-              </div>
-              <h4 class="text-warning">Necesitas más práctica</h4>
-              <p>Continúa practicando para mejorar tus habilidades.</p>
-              <p><strong>Puntos:</strong> ${score} | <strong>Aciertos:</strong> ${hits}</p>
-          `;
+        if (timeLeft <= 0) {
+          endGame();
+        }
       }
+    }, 1000);
 
-      modal.show();
+    // Game loop with requestAnimationFrame for smooth animation
+    function gameLoop() {
+      if (!gamePaused && gameRunning) {
+        moveTarget();
+        drawGame();
+      }
+      if (gameRunning) {
+        animationFrame = requestAnimationFrame(gameLoop);
+      }
+    }
+    gameLoop();
+  }
+
+  // Pause game
+  function pauseGame() {
+    gamePaused = !gamePaused;
+    pauseBtn.innerHTML = gamePaused
+      ? '<i class="fas fa-play me-2"></i>Continuar'
+      : '<i class="fas fa-pause me-2"></i>Pausar';
+
+    if (!gamePaused && gameRunning) {
+      function gameLoop() {
+        if (!gamePaused && gameRunning) {
+          moveTarget();
+          drawGame();
+        }
+        if (gameRunning) {
+          animationFrame = requestAnimationFrame(gameLoop);
+        }
+      }
+      gameLoop();
+    }
+  }
+
+  // End game
+  function endGame() {
+    cancelAnimationFrame(animationFrame);
+    clearInterval(timerInterval);
+    gameRunning = false;
+
+    // Calculate final metrics
+    const totalAttempts = hits + misses;
+    const precision = totalAttempts > 0 ? (hits / totalAttempts) * 100 : 0;
+    const success = precision >= (nivel === 1 ? 60 : nivel === 2 ? 50 : 40) && hits >= (nivel * 3);
+
+    // Prepare metrics data
+    const metricsData = {
+      precision: precision.toFixed(2),
+      hitRate: (hits / totalAttempts * 100).toFixed(2),
+      avgReactionTime: metrics.reactionTimes.length > 0
+        ? (metrics.reactionTimes.reduce((a, b) => a + b, 0) / metrics.reactionTimes.length).toFixed(0)
+        : 0,
+      movementRange: Math.max(
+        metrics.maxX !== -Infinity ? metrics.maxX - metrics.minX : 0,
+        metrics.maxY !== -Infinity ? metrics.maxY - metrics.minY : 0
+      ).toFixed(0),
+      maxCombo: maxCombo,
+      consistency: metrics.reactionTimes.length > 1
+        ? (100 - (Math.sqrt(metrics.reactionTimes.reduce((sum, rt) => {
+            const avg = metrics.reactionTimes.reduce((a, b) => a + b, 0) / metrics.reactionTimes.length;
+            return sum + Math.pow(rt - avg, 2);
+          }, 0) / metrics.reactionTimes.length) / (metrics.reactionTimes.reduce((a, b) => a + b, 0) / metrics.reactionTimes.length) * 100)).toFixed(1)
+        : 100
+    };
+
+    // Prepare metrics data
+    const avgReactionTime = metrics.reactionTimes.length > 0
+      ? parseFloat((metrics.reactionTimes.reduce((a, b) => a + b, 0) / metrics.reactionTimes.length).toFixed(0))
+      : null;
+
+    const elapsed = (Date.now() - metrics.startTime) / 1000;
+    const avgSpeed = elapsed > 0 ? parseFloat((metrics.totalDistance / elapsed).toFixed(1)) : null;
+
+    const movementRange = Math.max(
+      metrics.maxX !== -Infinity ? metrics.maxX - metrics.minX : 0,
+      metrics.maxY !== -Infinity ? metrics.maxY - metrics.minY : 0
+    );
+
+    const consistency = metrics.reactionTimes.length > 1
+      ? parseFloat((100 - (Math.sqrt(metrics.reactionTimes.reduce((sum, rt) => {
+          const avg = metrics.reactionTimes.reduce((a, b) => a + b, 0) / metrics.reactionTimes.length;
+          return sum + Math.pow(rt - avg, 2);
+        }, 0) / metrics.reactionTimes.length) / (metrics.reactionTimes.reduce((a, b) => a + b, 0) / metrics.reactionTimes.length) * 100)).toFixed(1))
+      : null;
+
+    // Send result to server with advanced metrics
+    fetch('/api/ejercicios/resultado', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        nivel: nivel,
+        ejercicio_id: `rehabilitacion_nivel_${nivel}`,
+        exito: success,
+        duracion: 60 - timeLeft,
+        tiempo_ejecucion: 60 - timeLeft,
+        puntuacion: score,
+        observaciones: JSON.stringify(metricsData),
+        precision: parseFloat(precision),
+        velocidad_promedio: avgSpeed,
+        rango_movimiento: parseFloat(movementRange.toFixed(0)),
+        tiempo_reaccion_promedio: avgReactionTime,
+        tasa_aciertos: parseFloat(precision),
+        consistencia: consistency,
+        combo_maximo: maxCombo,
+        aciertos: hits,
+        fallos: misses
+      })
+    });
+
+    // Show result modal
+    const modal = new bootstrap.Modal(document.getElementById('resultModal'));
+    const resultContent = document.getElementById('resultContent');
+
+    if (success) {
+      resultContent.innerHTML = `
+        <div class="text-success mb-3">
+          <i class="fas fa-trophy fa-3x"></i>
+        </div>
+        <h4 class="text-success">¡Excelente trabajo!</h4>
+        <p>Has completado el ejercicio con éxito.</p>
+        <div class="mt-3">
+          <p><strong>Puntos:</strong> ${score} | <strong>Aciertos:</strong> ${hits}/${totalAttempts}</p>
+          <p><strong>Precisión:</strong> ${precision.toFixed(1)}% | <strong>Combo Máximo:</strong> ${maxCombo}</p>
+          <p><strong>Tiempo de Reacción Promedio:</strong> ${metricsData.avgReactionTime} ms</p>
+          <p><strong>Rango de Movimiento:</strong> ${metricsData.movementRange} px</p>
+        </div>
+      `;
+    } else {
+      resultContent.innerHTML = `
+        <div class="text-warning mb-3">
+          <i class="fas fa-exclamation-triangle fa-3x"></i>
+        </div>
+        <h4 class="text-warning">Continúa practicando</h4>
+        <p>Tu precisión fue del ${precision.toFixed(1)}%. Sigue practicando para mejorar.</p>
+        <div class="mt-3">
+          <p><strong>Puntos:</strong> ${score} | <strong>Aciertos:</strong> ${hits}/${totalAttempts}</p>
+          <p><strong>Combo Máximo:</strong> ${maxCombo}</p>
+        </div>
+      `;
+    }
+
+    modal.show();
   }
 
   // Event listeners
-  startBtn.addEventListener('click', startGame);
   pauseBtn.addEventListener('click', pauseGame);
 
+  // Initialize and start game when page loads
+  // Use DOMContentLoaded to ensure canvas is ready
+  function initializeAndStart() {
+    if (!canvas) {
+      console.error('Canvas element not found!');
+      return;
+    }
+    if (!ctx) {
+      console.error('Canvas context not available!');
+      return;
+    }
+
+    console.log('Initializing game for level:', nivel);
+    initGame();
+    setTimeout(() => {
+      console.log('Starting game...');
+      startGame();
+    }, 500);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAndStart);
+  } else {
+    // DOM is already ready
+    initializeAndStart();
+  }
+
   canvas.addEventListener('click', (e) => {
-      if (!gameRunning || gamePaused) return;
+    if (!gameRunning || gamePaused) return;
 
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
 
-      checkHit(mouseX, mouseY);
+    checkHit(mouseX, mouseY);
   });
 
-  // Initialize game
-  initGame();
+  // Track mouse movement for cursor trail
+  canvas.addEventListener('mousemove', (e) => {
+    if (!gameRunning || gamePaused) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    metrics.movementHistory.push({ x: mouseX, y: mouseY });
+    if (metrics.movementHistory.length > 50) {
+      metrics.movementHistory.shift();
+    }
+  });
 </script>
 {% endblock %}

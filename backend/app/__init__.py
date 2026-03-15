@@ -2,7 +2,7 @@
 Aplicación Flask Principal - Factory Pattern
 Responsable de crear y configurar la aplicación Flask
 """
-from flask import Flask
+from flask import Flask, request, session
 from flask_cors import CORS
 from flask_session import Session
 import logging
@@ -50,6 +50,9 @@ def create_app(config_name='development'):
     # Configurar manejo de errores
     register_error_handlers(app)
     
+    # Configurar middleware para manejar sesiones corruptas
+    setup_session_middleware(app)
+    
     return app
 
 
@@ -59,6 +62,11 @@ def init_extensions(app):
     from config.settings import get_cors_config
     cors_config = get_cors_config()
     CORS(app, **cors_config)
+    
+    # Crear directorio de sesiones si no existe
+    session_dir = app.config.get('SESSION_FILE_DIR')
+    if session_dir and not os.path.exists(session_dir):
+        os.makedirs(session_dir, exist_ok=True)
     
     # Configurar sesiones
     Session(app)
@@ -90,10 +98,35 @@ def setup_logging(app):
 def register_blueprints(app):
     """Registra los blueprints de la aplicación"""
     from .routes import auth_bp, ejercicio_bp, main_bp
+    from .controllers.configuracion_controller import configuracion_bp
+    from .controllers.gamificacion_controller import gamificacion_bp
+    from .controllers.sesion_controller import sesion_bp
+    from .controllers.reporte_controller import reporte_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(ejercicio_bp, url_prefix='/api/ejercicios')
+    app.register_blueprint(configuracion_bp, url_prefix='/api')
+    app.register_blueprint(gamificacion_bp, url_prefix='/api')
+    app.register_blueprint(sesion_bp, url_prefix='/api')
+    app.register_blueprint(reporte_bp, url_prefix='/api')
+
+
+def setup_session_middleware(app):
+    """Configura middleware para manejar sesiones corruptas"""
+    @app.before_request
+    def handle_corrupt_session():
+        """Limpia la sesión si está corrupta"""
+        try:
+            # Intentar acceder a la sesión para detectar si está corrupta
+            _ = session.get('_permanent', False)
+        except (ValueError, TypeError, KeyError) as e:
+            # Si hay un error al leer la sesión (cookie corrupta), limpiarla
+            app.logger.warning(f'Sesión corrupta detectada, limpiando: {str(e)}')
+            try:
+                session.clear()
+            except:
+                pass
 
 
 def register_error_handlers(app):
@@ -109,6 +142,23 @@ def register_error_handlers(app):
     
     @app.errorhandler(400)
     def bad_request_error(error):
+        """Maneja errores 400, incluyendo sesiones corruptas"""
+        # Si el error es por una sesión corrupta, limpiarla
+        try:
+            if hasattr(error, 'description') and 'session' in str(error.description).lower():
+                session.clear()
+                app.logger.warning('Sesión corrupta detectada en error 400, limpiada')
+        except:
+            pass
+        
+        # Si es una petición a la ruta raíz, intentar renderizar el template
+        if request.path == '/':
+            try:
+                from flask import render_template
+                return render_template('index.html')
+            except:
+                pass
+        
         return {'error': 'Solicitud incorrecta'}, 400
     
     @app.errorhandler(401)

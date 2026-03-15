@@ -111,6 +111,18 @@ class MySQLDatabaseManager:
                     `fecha_actualizacion` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     `activo` tinyint(1) DEFAULT 1,
                     `notas` text,
+                    `altura_cm` int(3) DEFAULT NULL,
+                    `rango_movimiento_hombro` int(3) DEFAULT 180,
+                    `rango_movimiento_codo` int(3) DEFAULT 150,
+                    `rango_movimiento_muneca` int(3) DEFAULT 90,
+                    `modo_accesibilidad` enum('sentado','pie','ambos') DEFAULT 'ambos',
+                    `manos_habilitadas` enum('izquierda','derecha','ambas') DEFAULT 'ambas',
+                    `velocidad_juego` decimal(3,2) DEFAULT 1.00,
+                    `tamano_objetivos` enum('pequeno','mediano','grande') DEFAULT 'mediano',
+                    `dificultad_adaptativa` tinyint(1) DEFAULT 1,
+                    `controles_simplificados` tinyint(1) DEFAULT 0,
+                    `texto_grande` tinyint(1) DEFAULT 0,
+                    `alto_contraste` tinyint(1) DEFAULT 0,
                     PRIMARY KEY (`id`),
                     UNIQUE KEY `uk_uuid` (`uuid`),
                     UNIQUE KEY `uk_email` (`email`),
@@ -129,6 +141,15 @@ class MySQLDatabaseManager:
                     `duracion_segundos` int(11) DEFAULT 0,
                     `puntuacion` int(11) DEFAULT 0,
                     `observaciones` text,
+                    `precision` decimal(5,2) DEFAULT NULL,
+                    `velocidad_promedio` decimal(8,2) DEFAULT NULL,
+                    `rango_movimiento` decimal(5,2) DEFAULT NULL,
+                    `tiempo_reaccion_promedio` decimal(8,2) DEFAULT NULL,
+                    `tasa_aciertos` decimal(5,2) DEFAULT NULL,
+                    `consistencia` decimal(5,2) DEFAULT NULL,
+                    `combo_maximo` int(11) DEFAULT NULL,
+                    `aciertos` int(11) DEFAULT NULL,
+                    `fallos` int(11) DEFAULT NULL,
                     PRIMARY KEY (`id`),
                     KEY `fk_historial_paciente` (`paciente_id`),
                     KEY `idx_fecha_ejercicio` (`fecha_ejercicio`),
@@ -144,10 +165,83 @@ class MySQLDatabaseManager:
                     `duracion_minutos` int(11) DEFAULT 0,
                     `tipo_terapia` varchar(50) NOT NULL,
                     `observaciones` text,
+                    `fecha_inicio` datetime DEFAULT NULL,
+                    `fecha_fin` datetime DEFAULT NULL,
+                    `calentamiento_completado` tinyint(1) DEFAULT 0,
+                    `enfriamiento_completado` tinyint(1) DEFAULT 0,
+                    `nivel_fatiga` int(1) DEFAULT NULL,
+                    `nivel_dolor` int(1) DEFAULT NULL,
+                    `alertas_descanso` int(3) DEFAULT 0,
+                    `pausas_tomadas` int(3) DEFAULT 0,
                     PRIMARY KEY (`id`),
                     KEY `fk_sesiones_paciente` (`paciente_id`),
                     KEY `idx_fecha_sesion` (`fecha_sesion`),
                     CONSTRAINT `fk_sesiones_paciente` FOREIGN KEY (`paciente_id`) REFERENCES `pacientes` (`id`) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            """,
+            
+            'gamificacion_pacientes': """
+                CREATE TABLE IF NOT EXISTS `gamificacion_pacientes` (
+                    `id` int(11) NOT NULL AUTO_INCREMENT,
+                    `paciente_id` int(11) NOT NULL,
+                    `puntos_totales` int(11) DEFAULT 0,
+                    `nivel_actual` int(11) DEFAULT 1,
+                    `experiencia_actual` int(11) DEFAULT 0,
+                    `experiencia_siguiente_nivel` int(11) DEFAULT 100,
+                    `racha_dias` int(11) DEFAULT 0,
+                    `ultima_actividad` date DEFAULT NULL,
+                    `avatar_seleccionado` varchar(50) DEFAULT 'default',
+                    PRIMARY KEY (`id`),
+                    UNIQUE KEY `uk_gamificacion_paciente` (`paciente_id`),
+                    CONSTRAINT `fk_gamificacion_paciente` FOREIGN KEY (`paciente_id`) REFERENCES `pacientes` (`id`) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            """,
+            
+            'logros': """
+                CREATE TABLE IF NOT EXISTS `logros` (
+                    `id` int(11) NOT NULL AUTO_INCREMENT,
+                    `codigo` varchar(50) NOT NULL UNIQUE,
+                    `nombre` varchar(100) NOT NULL,
+                    `descripcion` text,
+                    `icono` varchar(50) DEFAULT 'trophy',
+                    `puntos_recompensa` int(11) DEFAULT 0,
+                    `tipo` enum('sesiones','precision','racha','especial') DEFAULT 'sesiones',
+                    `requisito_valor` int(11) DEFAULT 0,
+                    PRIMARY KEY (`id`),
+                    UNIQUE KEY `uk_logro_codigo` (`codigo`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            """,
+            
+            'logros_pacientes': """
+                CREATE TABLE IF NOT EXISTS `logros_pacientes` (
+                    `id` int(11) NOT NULL AUTO_INCREMENT,
+                    `paciente_id` int(11) NOT NULL,
+                    `logro_id` int(11) NOT NULL,
+                    `fecha_obtencion` datetime DEFAULT CURRENT_TIMESTAMP,
+                    `progreso_actual` int(11) DEFAULT 0,
+                    `completado` tinyint(1) DEFAULT 0,
+                    PRIMARY KEY (`id`),
+                    UNIQUE KEY `uk_logro_paciente` (`paciente_id`, `logro_id`),
+                    KEY `fk_logros_paciente` (`paciente_id`),
+                    KEY `fk_logros_logro` (`logro_id`),
+                    CONSTRAINT `fk_logros_paciente` FOREIGN KEY (`paciente_id`) REFERENCES `pacientes` (`id`) ON DELETE CASCADE,
+                    CONSTRAINT `fk_logros_logro` FOREIGN KEY (`logro_id`) REFERENCES `logros` (`id`) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            """,
+            
+            'objetivos_diarios': """
+                CREATE TABLE IF NOT EXISTS `objetivos_diarios` (
+                    `id` int(11) NOT NULL AUTO_INCREMENT,
+                    `paciente_id` int(11) NOT NULL,
+                    `fecha` date NOT NULL,
+                    `objetivo_sesiones` int(3) DEFAULT 1,
+                    `sesiones_completadas` int(3) DEFAULT 0,
+                    `objetivo_tiempo_minutos` int(11) DEFAULT 15,
+                    `tiempo_completado_minutos` int(11) DEFAULT 0,
+                    `completado` tinyint(1) DEFAULT 0,
+                    PRIMARY KEY (`id`),
+                    UNIQUE KEY `uk_objetivo_paciente_fecha` (`paciente_id`, `fecha`),
+                    CONSTRAINT `fk_objetivos_paciente` FOREIGN KEY (`paciente_id`) REFERENCES `pacientes` (`id`) ON DELETE CASCADE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             """
         }

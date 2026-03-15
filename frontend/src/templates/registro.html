@@ -76,7 +76,7 @@ block content %}
                 <i class="fas fa-user-plus me-2"></i>Registrarse
               </button>
               <a
-                href="{{ url_for('index') }}"
+                href="{{ url_for('main.index') }}"
                 class="btn btn-outline-secondary"
               >
                 <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
@@ -88,7 +88,7 @@ block content %}
             <p class="text-muted">
               ¿Ya tienes una cuenta?
               <a
-                href="{{ url_for('login') }}"
+                href="{{ url_for('main.login') }}"
                 class="text-primary text-decoration-none"
               >
                 Inicia sesión aquí
@@ -147,7 +147,7 @@ block content %}
       }
 
       try {
-        const response = await fetch("/registro", {
+        const response = await fetch("/api/auth/registro", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

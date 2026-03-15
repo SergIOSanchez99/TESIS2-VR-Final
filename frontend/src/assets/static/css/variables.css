@@ -1,0 +1,171 @@
+/* ============================================================
+   RehaVR — variables.css
+   Tokens de diseño: modo oscuro (por defecto) y modo claro
+   ============================================================ */
+
+/* ── Modo oscuro (predeterminado) ── */
+:root {
+  /* Fondos */
+  --rv-bg:          #0a1628;
+  --rv-bg-2:        #0d2137;
+  --rv-surface:     rgba(13, 33, 55, 0.85);
+  --rv-surface-2:   rgba(255, 255, 255, 0.04);
+
+  /* Bordes */
+  --rv-border:      rgba(0, 180, 216, 0.15);
+  --rv-border-soft: rgba(255, 255, 255, 0.07);
+
+  /* Colores de acento */
+  --rv-cyan:        #00b4d8;
+  --rv-cyan-glow:   rgba(0, 180, 216, 0.35);
+  --rv-green:       #43d382;
+  --rv-yellow:      #f9c74f;
+  --rv-red:         #f94144;
+  --rv-orange:      #ff9800;
+  --rv-purple:      #9d4edd;
+
+  /* Tipografía */
+  --rv-text:        #e2e8f0;
+  --rv-text-muted:  #7a8fa6;
+  --rv-text-faint:  rgba(255, 255, 255, 0.3);
+
+  /* Geometría */
+  --rv-radius:      16px;
+  --rv-radius-sm:   10px;
+  --rv-radius-xl:   24px;
+
+  /* Sombras */
+  --rv-shadow:      0 8px 32px rgba(0, 0, 0, 0.45);
+  --rv-shadow-lg:   0 16px 48px rgba(0, 0, 0, 0.6);
+  --rv-glow-cyan:   0 0 24px rgba(0, 180, 216, 0.3);
+
+  /* Grid decorativa */
+  --rv-grid-color:  rgba(0, 180, 216, 0.04);
+
+  /* Navbar */
+  --rv-nav-bg:      rgba(10, 22, 40, 0.97);
+  --rv-nav-text:    #e2e8f0;
+  --rv-nav-border:  rgba(0, 180, 216, 0.15);
+
+  /* Footer */
+  --rv-footer-bg:   #06101f;
+
+  /* Compatibilidad Bootstrap */
+  --primary-color:   #00b4d8;
+  --secondary-color: #0077a8;
+  --accent-color:    #f9c74f;
+  --success-color:   #43d382;
+  --danger-color:    #f94144;
+  --warning-color:   #f9c74f;
+  --info-color:      #00b4d8;
+}
+
+/* ── Modo claro ── */
+[data-theme="light"] {
+  /* Fondos */
+  --rv-bg:          #f0f4f8;
+  --rv-bg-2:        #e4ecf4;
+  --rv-surface:     rgba(255, 255, 255, 0.97);
+  --rv-surface-2:   rgba(0, 0, 0, 0.03);
+
+  /* Bordes */
+  --rv-border:      rgba(0, 120, 160, 0.2);
+  --rv-border-soft: rgba(0, 0, 0, 0.09);
+
+  /* Tipografía */
+  --rv-text:        #1a2332;
+  --rv-text-muted:  #4a6080;
+  --rv-text-faint:  rgba(0, 0, 0, 0.28);
+
+  /* Sombras */
+  --rv-shadow:      0 4px 20px rgba(0, 0, 0, 0.1);
+  --rv-shadow-lg:   0 10px 40px rgba(0, 0, 0, 0.15);
+  --rv-glow-cyan:   0 0 20px rgba(0, 180, 216, 0.2);
+
+  /* Grid */
+  --rv-grid-color:  rgba(0, 120, 160, 0.07);
+
+  /* Navbar */
+  --rv-nav-bg:      rgba(255, 255, 255, 0.98);
+  --rv-nav-text:    #1a2332;
+  --rv-nav-border:  rgba(0, 120, 160, 0.15);
+
+  /* Footer */
+  --rv-footer-bg:   #1a2332;
+}
+
+/* ── Overrides específicos del modo claro para el dashboard ── */
+[data-theme="light"] .rehavr-dashboard {
+  background:
+    radial-gradient(ellipse 80% 60% at 10%   0%, rgba(0,180,216,0.05)  0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(157,78,221,0.04)  0%, transparent 60%),
+    linear-gradient(180deg, #f0f4f8 0%, #e4ecf4 100%);
+}
+
+[data-theme="light"] .rehavr-header {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .rehavr-brand-name { color: #1a2332; }
+[data-theme="light"] .rehavr-clock-time  { color: #1a2332; }
+
+[data-theme="light"] .rehavr-patient-badge {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .rehavr-btn-icon {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #4a6080;
+}
+[data-theme="light"] .rehavr-btn-icon:hover {
+  background: rgba(0, 180, 216, 0.12);
+  color: var(--rv-cyan);
+}
+
+[data-theme="light"] .rehavr-stat-card,
+[data-theme="light"] .rehavr-section,
+[data-theme="light"] .rehavr-exercise-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+}
+
+[data-theme="light"] .rehavr-exercise-card {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="light"] .rehavr-table thead tr {
+  background: rgba(0, 180, 216, 0.06);
+}
+
+[data-theme="light"] .rehavr-table-row:hover {
+  background: rgba(0, 180, 216, 0.04);
+}
+
+[data-theme="light"] .rehavr-occ-card {
+  background: rgba(255, 152, 0, 0.04);
+}
+
+/* Navbar de Layout en modo oscuro */
+[data-theme="dark"] .layout-navbar {
+  background: var(--rv-nav-bg) !important;
+  border-bottom: 1px solid var(--rv-nav-border);
+}
+[data-theme="dark"] .layout-navbar .navbar-brand,
+[data-theme="dark"] .layout-navbar .nav-link {
+  color: var(--rv-nav-text) !important;
+}
+[data-theme="dark"] .layout-navbar .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+[data-theme="dark"] .layout-navbar .navbar-toggler-icon {
+  filter: invert(1);
+}
+
+/* Footer adaptable */
+footer.layout-footer {
+  background: var(--rv-footer-bg) !important;
+  color: var(--rv-text-muted);
+  transition: background 0.3s;
+}

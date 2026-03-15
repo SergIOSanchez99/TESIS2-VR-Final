@@ -1,0 +1,71 @@
+/* ============================================================
+   RehaVR — animations.css
+   Todas las definiciones de @keyframes del sistema
+   ============================================================ */
+
+/* Entrada suave desde abajo */
+@keyframes rehavr-fadein-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Rotación infinita (spinner) */
+@keyframes rehavr-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Pulso del indicador de estado activo */
+@keyframes rehavr-pulse-dot {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%       { opacity: 0.4; transform: scale(0.65); }
+}
+
+/* Flotación de íconos */
+@keyframes rehavr-float {
+  0%, 100% { transform: translateY(0);    }
+  50%       { transform: translateY(-5px); }
+}
+
+/* Línea de escaneo médico en el header */
+@keyframes rehavr-scan {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 300%  0; }
+}
+
+/* Shimmer en botones */
+@keyframes rehavr-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%);  }
+}
+
+/* Parpadeo de estrellas (legacy dashboard) */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.6; }
+}
+
+/* Fade-in genérico (compatibilidad) */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Spin genérico (compatibilidad) */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Transición de tema */
+@keyframes rehavr-theme-switch {
+  0%   { opacity: 0.7; }
+  100% { opacity: 1;   }
+}
+
+/* ── Clases de utilidad de animación ── */
+.rehavr-anim-fadein {
+  animation: rehavr-fadein-up 0.5s ease both;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}

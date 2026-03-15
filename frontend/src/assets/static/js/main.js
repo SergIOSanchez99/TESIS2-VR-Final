@@ -54,21 +54,21 @@ function setupForms() {
 }
 
 // Sistema de notificaciones
+// Definir funciones globales primero
+window.showSuccess = function (message) {
+  showNotification(message, "success");
+};
+
+window.showError = function (message) {
+  showNotification(message, "danger");
+};
+
+window.showInfo = function (message) {
+  showNotification(message, "info");
+};
+
 function setupNotifications() {
-  // Mostrar notificaciones de éxito
-  window.showSuccess = function (message) {
-    showNotification(message, "success");
-  };
-
-  // Mostrar notificaciones de error
-  window.showError = function (message) {
-    showNotification(message, "danger");
-  };
-
-  // Mostrar notificaciones de información
-  window.showInfo = function (message) {
-    showNotification(message, "info");
-  };
+  // Las funciones ya están definidas globalmente arriba
 }
 
 // Función para mostrar notificaciones
@@ -272,16 +272,16 @@ document.addEventListener("DOMContentLoaded", function () {
   if (window.location.pathname === "/dashboard") {
     setupSessionTimer();
   }
-});
 
-// Exportar funciones para uso global
-window.RehabSystem = {
-  showSuccess,
-  showError,
-  showInfo,
-  updateStats,
-  updateProgress,
-  toggleTheme,
-  changeFontSize,
-  exportUserData,
-};
+  // Exportar funciones para uso global después de que todo esté inicializado
+  window.RehabSystem = {
+    showSuccess: window.showSuccess,
+    showError: window.showError,
+    showInfo: window.showInfo,
+    updateStats,
+    updateProgress,
+    toggleTheme,
+    changeFontSize,
+    exportUserData,
+  };
+});
