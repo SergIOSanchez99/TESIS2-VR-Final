@@ -1,0 +1,302 @@
+/* ============================================================
+   RehaVR — components.css
+   Componentes compartidos: navbar, footer, formularios,
+   canvas de juego, terapia ocupacional, Bootstrap overrides
+   ============================================================ */
+
+/* ── Reset base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--rv-bg);
+  color: var(--rv-text);
+  min-height: 100vh;
+  margin: 0;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* ── Toggle de tema (sun/moon) ── */
+.rv-theme-toggle {
+  width: 38px;
+  height: 38px;
+  background: none;
+  border: 1px solid var(--rv-border-soft);
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--rv-text-muted);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.rv-theme-toggle:hover {
+  background: rgba(0,180,216,0.12);
+  border-color: var(--rv-cyan);
+  color: var(--rv-cyan);
+  transform: rotate(20deg) scale(1.05);
+  box-shadow: var(--rv-glow-cyan);
+}
+
+/* ── Navbar de Layout ── */
+.layout-navbar {
+  background: var(--rv-nav-bg) !important;
+  border-bottom: 1px solid var(--rv-nav-border);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.layout-navbar .navbar-brand {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--rv-cyan) !important;
+  letter-spacing: -0.3px;
+  text-decoration: none;
+}
+
+.layout-navbar .nav-link,
+.layout-navbar .nav-link.btn {
+  color: var(--rv-nav-text) !important;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.layout-navbar .nav-link:hover {
+  color: var(--rv-cyan) !important;
+}
+
+/* Toggler hamburguesa en modo oscuro */
+[data-theme="dark"] .layout-navbar .navbar-toggler-icon {
+  filter: invert(1) brightness(1.5);
+}
+
+/* ── Footer de Layout ── */
+.layout-footer {
+  background: var(--rv-footer-bg) !important;
+  color: var(--rv-text-muted);
+  transition: background 0.3s;
+}
+
+/* ── Bootstrap card overrides ── */
+.card {
+  border: 1px solid var(--rv-border-soft) !important;
+  border-radius: var(--rv-radius) !important;
+  box-shadow: var(--rv-shadow) !important;
+  background: var(--rv-surface) !important;
+  color: var(--rv-text) !important;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.card-title,
+.card-header { color: var(--rv-text) !important; }
+
+.card-text,
+.text-muted  { color: var(--rv-text-muted) !important; }
+
+/* ── Bootstrap btn overrides ── */
+.btn {
+  border-radius: 50px;
+  padding: 10px 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+  background-color: var(--rv-cyan) !important;
+  border-color: var(--rv-cyan) !important;
+}
+
+.btn-primary:hover {
+  background-color: #0099bc !important;
+  border-color: #0099bc !important;
+}
+
+.btn-success {
+  background-color: var(--rv-green) !important;
+  border-color: var(--rv-green) !important;
+}
+
+.btn-accent {
+  background-color: var(--rv-orange);
+  border-color: var(--rv-orange);
+  color: #fff;
+}
+
+/* ── Feature cards ── */
+.feature-card { transition: transform 0.3s ease; }
+.feature-card:hover { transform: translateY(-5px); }
+
+/* ── Formularios ── */
+.form-control {
+  border-radius: var(--rv-radius-sm);
+  border: 2px solid var(--rv-border-soft);
+  padding: 12px 15px;
+  background: var(--rv-surface) !important;
+  color: var(--rv-text) !important;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.form-control:focus {
+  border-color: var(--rv-cyan);
+  box-shadow: 0 0 0 0.2rem rgba(0,180,216,0.2);
+  background: var(--rv-surface) !important;
+  color: var(--rv-text) !important;
+}
+
+.form-control::placeholder {
+  color: var(--rv-text-muted);
+  opacity: 0.8;
+}
+
+.form-label { color: var(--rv-text); font-weight: 600; }
+
+/* ── Alertas ── */
+.alert {
+  border-radius: var(--rv-radius-sm);
+  border: none;
+  padding: 14px 20px;
+}
+
+/* ── Tablas Bootstrap ── */
+.table { color: var(--rv-text); }
+.table-hover > tbody > tr:hover { background-color: rgba(0,180,216,0.06) !important; }
+.table thead th { color: var(--rv-text-muted); border-color: var(--rv-border-soft); }
+.table td, .table th { border-color: var(--rv-border-soft); }
+
+/* ── Canvas de ejercicios ── */
+canvas {
+  border: 2px solid var(--rv-cyan);
+  border-radius: var(--rv-radius-sm);
+  background: #061020;
+}
+
+.game-container {
+  background: var(--rv-surface);
+  border-radius: var(--rv-radius);
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid var(--rv-border-soft);
+}
+
+/* ── Terapia ocupacional (páginas de terapia) ── */
+.therapy-exercise {
+  background: var(--rv-surface);
+  border-radius: var(--rv-radius);
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+  border: 1px solid var(--rv-border-soft);
+}
+
+.draggable-item { cursor: grab; transition: transform 0.2s ease; }
+.draggable-item:hover { transform: scale(1.08); }
+
+.drop-zone {
+  border: 2px dashed var(--rv-cyan);
+  border-radius: var(--rv-radius-sm);
+  padding: 20px;
+  text-align: center;
+  background: rgba(0,180,216,0.03);
+  transition: all 0.3s ease;
+}
+
+.drop-zone.dragover {
+  background: rgba(0,180,216,0.1);
+  border-color: var(--rv-cyan);
+  box-shadow: var(--rv-glow-cyan);
+}
+
+.shirt-button {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--rv-cyan);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin: 5px;
+  color: var(--rv-text);
+}
+
+.shirt-button:hover { background: var(--rv-cyan); color: #fff; transform: scale(1.1); }
+.shirt-button.completed { background: var(--rv-green); border-color: var(--rv-green); color: #fff; }
+
+/* ── Historial (legacy) ── */
+.history-item {
+  background: var(--rv-surface);
+  border-radius: var(--rv-radius-sm);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-left: 4px solid var(--rv-cyan);
+}
+
+/* ── Loading spinner (Bootstrap compat.) ── */
+.loading {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 3px solid rgba(0,180,216,0.15);
+  border-top: 3px solid var(--rv-cyan);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* ── Progress circle (badge avatar) ── */
+.progress-circle {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; font-weight: bold;
+  color: white; margin: 0 auto;
+}
+
+/* ── Hero section (Home) ── */
+.hero-section {
+  background: linear-gradient(135deg, var(--rv-bg) 0%, var(--rv-bg-2) 100%);
+  color: var(--rv-text);
+  padding: 4rem 0;
+}
+
+.hero-section h1 { font-size: 3rem; font-weight: bold; margin-bottom: 20px; }
+.hero-section p  { font-size: 1.2rem; margin-bottom: 30px; }
+
+/* ── Responsive general ── */
+@media (max-width: 768px) {
+  .card   { margin-bottom: 15px; }
+  .btn    { width: 100%; margin-bottom: 10px; }
+}
+
+/* ── Logo RehaVR (navbar) ── */
+.rehavr-logo, .navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 800;
+  color: var(--rv-cyan) !important;
+  text-decoration: none;
+  font-size: 1.3rem;
+}
+
+.rehavr-logo .logo-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+  font-size: 1.4rem;
+  position: relative;
+  padding: 0 4px;
+}
+
+.rehavr-logo .logo-h {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: inherit;
+}
+
+/* ── Texto de acento ── */
+.text-accent { color: var(--rv-orange) !important; }

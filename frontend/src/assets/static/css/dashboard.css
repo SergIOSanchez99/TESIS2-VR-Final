@@ -1,0 +1,735 @@
+/* ============================================================
+   RehaVR — dashboard.css
+   Estilos exclusivos del Dashboard principal (.rehavr-*)
+   ============================================================ */
+
+/* ── Layout raíz ── */
+.rehavr-dashboard {
+  position: relative;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 80% 60% at 10%   0%, rgba(0,180,216,0.08)  0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(157,78,221,0.07)  0%, transparent 60%),
+    linear-gradient(180deg, var(--rv-bg) 0%, var(--rv-bg-2) 100%);
+  overflow-x: hidden;
+  transition: background 0.4s ease;
+}
+
+/* Cuadrícula decorativa de fondo */
+.rehavr-grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--rv-grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rv-grid-color) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+  transition: background-image 0.4s;
+}
+
+/* ── HEADER ── */
+.rehavr-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 22, 40, 0.93);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--rv-border);
+  box-shadow: 0 2px 24px rgba(0,0,0,0.4);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+/* Línea de escaneo animada */
+.rehavr-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--rv-cyan) 40%,
+    rgba(0,180,216,0.2) 70%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: rehavr-scan 4s linear infinite;
+}
+
+.rehavr-header-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Marca / logo */
+.rehavr-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.rehavr-logo-mark {
+  width: 42px;
+  height: 42px;
+  background: rgba(0,180,216,0.12);
+  border: 1px solid rgba(0,180,216,0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px rgba(0,180,216,0.35));
+  flex-shrink: 0;
+}
+
+.rehavr-brand-name {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--rv-text);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  transition: color 0.3s;
+}
+
+.rehavr-brand-sub {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--rv-cyan);
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Reloj */
+.rehavr-clock {
+  margin: 0 auto;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.rehavr-clock-time {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--rv-text);
+  letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: color 0.3s;
+}
+
+.rehavr-clock-date {
+  font-size: 0.7rem;
+  color: var(--rv-text-muted);
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  margin-top: 3px;
+}
+
+/* Acciones del header */
+.rehavr-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.rehavr-patient-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  background: var(--rv-surface-2);
+  border: 1px solid var(--rv-border-soft);
+  border-radius: 50px;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.rehavr-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rv-cyan), var(--rv-purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px var(--rv-cyan-glow);
+}
+
+.rehavr-patient-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--rv-text);
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rehavr-patient-status {
+  font-size: 0.67rem;
+  color: var(--rv-green);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rehavr-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rv-green);
+  display: inline-block;
+  animation: rehavr-pulse-dot 2s ease-in-out infinite;
+}
+
+/* Botón icono (config, tema) */
+.rehavr-btn-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rv-surface-2);
+  border: 1px solid var(--rv-border-soft);
+  border-radius: 10px;
+  color: var(--rv-text-muted);
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.rehavr-btn-icon:hover {
+  background: rgba(0,180,216,0.15);
+  border-color: var(--rv-cyan);
+  color: var(--rv-cyan);
+  box-shadow: var(--rv-glow-cyan);
+  transform: translateY(-1px);
+}
+
+/* Botón cerrar sesión */
+.rehavr-btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: rgba(249,65,68,0.1);
+  border: 1px solid rgba(249,65,68,0.25);
+  border-radius: 50px;
+  color: var(--rv-red);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.3px;
+}
+
+.rehavr-btn-logout:hover {
+  background: rgba(249,65,68,0.2);
+  border-color: rgba(249,65,68,0.5);
+  box-shadow: 0 0 16px rgba(249,65,68,0.2);
+  transform: translateY(-1px);
+}
+
+/* ── MAIN ── */
+.rehavr-main {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── STATS ── */
+.rehavr-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.rehavr-stat-card {
+  position: relative;
+  background: var(--rv-surface);
+  border: 1px solid var(--rv-border-soft);
+  border-radius: var(--rv-radius);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s;
+  backdrop-filter: blur(12px);
+}
+
+.rehavr-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--rv-cyan), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.rehavr-stat-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(0,180,216,0.3);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), var(--rv-glow-cyan);
+}
+
+.rehavr-stat-card:hover::before { opacity: 1; }
+
+.rehavr-stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.rehavr-stat-content { flex: 1; min-width: 0; }
+
+.rehavr-stat-value {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: var(--rv-text);
+  line-height: 1;
+  letter-spacing: -1px;
+  transition: color 0.3s;
+}
+
+.rehavr-stat-label {
+  font-size: 0.73rem;
+  color: var(--rv-text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 5px;
+}
+
+/* Anillo SVG */
+.rehavr-stat-ring {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+}
+
+.rehavr-stat-ring svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.rehavr-ring-fill {
+  transition: stroke-dasharray 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── SECCIONES ── */
+.rehavr-section {
+  background: var(--rv-surface);
+  border: 1px solid var(--rv-border-soft);
+  border-radius: var(--rv-radius-xl);
+  padding: 2rem;
+  backdrop-filter: blur(12px);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.rehavr-section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.rehavr-section-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background: rgba(0,180,216,0.12);
+  color: var(--rv-cyan);
+  border: 1px solid rgba(0,180,216,0.2);
+  flex-shrink: 0;
+}
+
+.rehavr-section-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--rv-text);
+  margin: 0 0 2px;
+  line-height: 1.2;
+  transition: color 0.3s;
+}
+
+.rehavr-section-sub {
+  font-size: 0.78rem;
+  color: var(--rv-text-muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+.rehavr-section-badge {
+  margin-left: auto;
+  padding: 5px 14px;
+  background: rgba(0,180,216,0.1);
+  border: 1px solid rgba(0,180,216,0.25);
+  border-radius: 50px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: var(--rv-cyan);
+  white-space: nowrap;
+}
+
+/* ── CARDS DE EJERCICIO (Rehabilitación) ── */
+.rehavr-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.rehavr-exercise-card {
+  position: relative;
+  background: var(--rv-surface-2);
+  border: 1px solid var(--rv-border-soft);
+  border-radius: var(--rv-radius);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s;
+}
+
+.rehavr-card-accent {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.rehavr-exercise-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+}
+
+.rehavr-exercise-card:hover .rehavr-card-accent { opacity: 1; }
+
+.rehavr-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rehavr-card-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background: rgba(255,255,255,0.04);
+  transition: box-shadow 0.3s;
+}
+
+.rehavr-level-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rehavr-card-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--rv-text);
+  margin: 0;
+  transition: color 0.3s;
+}
+
+.rehavr-card-desc {
+  font-size: 0.82rem;
+  color: var(--rv-text-muted);
+  line-height: 1.65;
+  margin: 0;
+  flex: 1;
+}
+
+.rehavr-card-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.72rem;
+  color: var(--rv-text-faint);
+  font-weight: 600;
+}
+
+.rehavr-card-meta i { margin-right: 4px; }
+
+/* ── BOTÓN PRIMARIO ── */
+.rehavr-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 22px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--btn-color, #00b4d8) 80%, white 20%),
+    var(--btn-color, #00b4d8)
+  );
+  border: none;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 0.87rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.rehavr-btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  opacity: 0;
+  transition: opacity 0.25s;
+  border-radius: inherit;
+}
+
+.rehavr-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--btn-glow, rgba(0,180,216,0.4));
+  filter: brightness(1.08);
+  color: #fff;
+}
+
+.rehavr-btn-primary:hover::after { opacity: 1; }
+.rehavr-btn-primary:active { transform: translateY(0); filter: brightness(0.95); }
+
+/* ── TERAPIA OCUPACIONAL ── */
+.rehavr-occ-card {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  background: rgba(255,152,0,0.05);
+  border: 1px solid rgba(255,152,0,0.15);
+  border-radius: var(--rv-radius);
+  padding: 2rem;
+  position: relative;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.rehavr-occ-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, #ff9800, transparent);
+}
+
+.rehavr-occ-visual {
+  flex-shrink: 0;
+  width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rehavr-occ-icons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.rehavr-occ-icon {
+  width: 42px;
+  height: 42px;
+  background: rgba(255,152,0,0.1);
+  border: 1px solid rgba(255,152,0,0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #ff9800;
+  animation: rehavr-float 3s ease-in-out infinite;
+}
+
+.rehavr-occ-content { flex: 1; }
+
+.rehavr-occ-content h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--rv-text);
+  margin: 0 0 0.6rem;
+  transition: color 0.3s;
+}
+
+.rehavr-occ-content p {
+  font-size: 0.84rem;
+  color: var(--rv-text-muted);
+  line-height: 1.7;
+  margin: 0 0 1rem;
+}
+
+.rehavr-occ-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+
+.rehavr-occ-tags span {
+  padding: 4px 12px;
+  background: rgba(255,152,0,0.1);
+  border: 1px solid rgba(255,152,0,0.2);
+  border-radius: 50px;
+  font-size: 0.71rem;
+  font-weight: 700;
+  color: #ff9800;
+  letter-spacing: 0.3px;
+}
+
+/* ── TABLA DE HISTORIAL ── */
+.rehavr-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--rv-radius-sm);
+  border: 1px solid var(--rv-border-soft);
+}
+
+.rehavr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+}
+
+.rehavr-table thead tr {
+  background: rgba(0,180,216,0.07);
+}
+
+.rehavr-table th {
+  padding: 14px 20px;
+  text-align: left;
+  color: var(--rv-cyan);
+  font-size: 0.71rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--rv-border);
+  white-space: nowrap;
+}
+
+.rehavr-table th i { margin-right: 6px; opacity: 0.8; }
+
+.rehavr-table-row {
+  border-bottom: 1px solid var(--rv-border-soft);
+  transition: background 0.2s;
+}
+
+.rehavr-table-row:last-child { border-bottom: none; }
+.rehavr-table-row:hover { background: rgba(255,255,255,0.03); }
+
+.rehavr-table td {
+  padding: 14px 20px;
+  color: var(--rv-text-muted);
+  vertical-align: middle;
+}
+
+.rehavr-exercise-name {
+  font-weight: 600;
+  color: var(--rv-text);
+  font-size: 0.85rem;
+}
+
+.rehavr-score {
+  font-weight: 700;
+  color: var(--rv-cyan);
+  font-variant-numeric: tabular-nums;
+}
+
+.rehavr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  border-radius: 50px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.rehavr-badge-success {
+  background: rgba(67,211,130,0.12);
+  color: var(--rv-green);
+  border: 1px solid rgba(67,211,130,0.25);
+}
+
+.rehavr-badge-warn {
+  background: rgba(249,199,79,0.12);
+  color: var(--rv-yellow);
+  border: 1px solid rgba(249,199,79,0.25);
+}
+
+/* ── SPINNER ── */
+.rehavr-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(0,180,216,0.15);
+  border-top-color: var(--rv-cyan);
+  border-radius: 50%;
+  animation: rehavr-spin 0.85s linear infinite;
+  margin: 0 auto;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) {
+  .rehavr-stats-row  { grid-template-columns: repeat(2, 1fr); }
+  .rehavr-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .rehavr-header-inner { padding: 0 1rem; gap: 0.75rem; }
+  .rehavr-clock        { display: none; }
+  .rehavr-brand-sub    { display: none; }
+  .rehavr-main         { padding: 1.25rem 1rem 3rem; }
+  .rehavr-stats-row    { grid-template-columns: repeat(2, 1fr); }
+  .rehavr-cards-grid   { grid-template-columns: 1fr; }
+  .rehavr-occ-card     { flex-direction: column; }
+  .rehavr-occ-visual   { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .rehavr-stats-row    { grid-template-columns: 1fr; }
+  .rehavr-patient-name { max-width: 90px; }
+  .rehavr-btn-logout span { display: none; }
+}
