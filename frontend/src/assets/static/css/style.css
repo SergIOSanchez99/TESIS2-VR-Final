@@ -6,10 +6,12 @@
    ├── variables.css   → Tokens de diseño, modo oscuro/claro
    ├── animations.css  → Todos los @keyframes y clases de animación
    ├── components.css  → Navbar, footer, formularios, Bootstrap overrides
+   ├── home.css        → Estilos exclusivos de la pagina de inicio
    └── dashboard.css   → Componentes exclusivos del Dashboard (.rehavr-*)
    ============================================================ */
 
 @import './variables.css';
 @import './animations.css';
 @import './components.css';
+@import './home.css';
 @import './dashboard.css';
