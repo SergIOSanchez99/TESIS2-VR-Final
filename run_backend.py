@@ -12,10 +12,10 @@ from pathlib import Path
 def check_python_version():
     """Verifica que la versión de Python sea compatible"""
     if sys.version_info < (3, 8):
-        print("❌ Error: Se requiere Python 3.8 o superior")
-        print(f"   Versión actual: {sys.version}")
+        print("Error: Se requiere Python 3.8 o superior")
+        print(f"Versión actual: {sys.version}")
         sys.exit(1)
-    print(f"✅ Python {sys.version.split()[0]} detectado")
+    print(f"Python {sys.version.split()[0]} detectado")
 
 def get_python_executable():
     """Obtiene el ejecutable de Python del entorno virtual o del sistema"""
@@ -31,26 +31,26 @@ def install_dependencies():
     requirements_file = backend_path / "requirements.txt"
     
     if not requirements_file.exists():
-        print("❌ Error: No se encontró requirements.txt en el directorio backend")
+        print("Error: No se encontró requirements.txt en el directorio backend")
         sys.exit(1)
     
     python_exe = get_python_executable()
     
-    print("📦 Instalando dependencias del backend...")
+    print("Instalando dependencias del backend...")
     try:
         result = subprocess.run([
             python_exe, "-m", "pip", "install", "-r", str(requirements_file)
         ], capture_output=True, text=True)
         
         if result.returncode != 0:
-            print(f"❌ Error al instalar dependencias:")
+            print(f"Error al instalar dependencias:")
             print(result.stderr)
             sys.exit(1)
         
-        print("✅ Dependencias instaladas correctamente")
+        print("Dependencias instaladas correctamente")
     except Exception as e:
-        print(f"❌ Error al instalar dependencias: {e}")
-        print("💡 Intenta instalar manualmente con: .\\venv\\Scripts\\python.exe -m pip install -r backend/requirements.txt")
+        print(f"Error al instalar dependencias: {e}")
+        print("Intenta instalar manualmente con: .\\venv\\Scripts\\python.exe -m pip install -r backend/requirements.txt")
         sys.exit(1)
 
 def setup_environment():
@@ -67,7 +67,7 @@ def setup_environment():
     for key, value in env_vars.items():
         os.environ[key] = value
 
-    print("🔧 Variables de entorno configuradas")
+    print("Variables de entorno configuradas")
 
 def create_directories():
     """Crea los directorios necesarios"""
@@ -80,20 +80,20 @@ def create_directories():
     for directory in directories:
         Path(directory).mkdir(parents=True, exist_ok=True)
 
-    print("📁 Directorios creados/verificados")
+    print("Directorios creados/verificados")
 
 def run_backend():
     """Ejecuta el backend"""
     backend_path = Path("backend")
     
     if not backend_path.exists():
-        print("❌ Error: No se encontró el directorio backend")
+        print("Error: No se encontró el directorio backend")
         sys.exit(1)
     
     run_file = backend_path / "run.py"
     
     if not run_file.exists():
-        print("❌ Error: No se encontró run.py en el directorio backend")
+        print("Error: No se encontró run.py en el directorio backend")
         sys.exit(1)
     
     python_exe = get_python_executable()
@@ -101,9 +101,9 @@ def run_backend():
     # Resolver ruta absoluta del archivo run.py
     run_file_abs = run_file.resolve()
     
-    print("🚀 Iniciando RehaVR Backend...")
-    print("📍 Servidor: http://localhost:5000")
-    print("🔧 Modo: Desarrollo")
+    print("Iniciando RehaVR Backend...")
+    print("Servidor: http://localhost:5000")
+    print("Modo: Desarrollo")
     print("=" * 50)
     
     try:
@@ -118,18 +118,18 @@ def run_backend():
             # Restaurar el directorio original
             os.chdir(original_dir)
     except KeyboardInterrupt:
-        print("\n🛑 Servidor detenido por el usuario")
+        print("\nServidor detenido por el usuario")
         os.chdir(original_dir)
     except Exception as e:
-        print(f"❌ Error al ejecutar el backend: {e}")
-        print(f"   Python ejecutable: {python_exe}")
-        print(f"   Archivo run.py: {run_file_abs}")
+        print(f"Error al ejecutar el backend: {e}")
+        print(f"Python ejecutable: {python_exe}")
+        print(f"Archivo run.py: {run_file_abs}")
         os.chdir(original_dir)
         sys.exit(1)
 
 def main():
     """Función principal"""
-    print("🦾 RehaVR - Sistema de Rehabilitación Motora")
+    print("RehaVR - Sistema de Rehabilitación Motora")
     print("=" * 50)
     
     # Verificar versión de Python

@@ -19,10 +19,10 @@ if __name__ == '__main__':
     port = int(os.environ.get('FLASK_PORT', 5000))
     debug = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
     
-    print(f"🚀 Iniciando RehaVR Backend...")
-    print(f"📍 Servidor: http://{host}:{port}")
-    print(f"🔧 Modo debug: {debug}")
-    print(f"🌐 Entorno: {os.environ.get('FLASK_ENV', 'development')}")
+    print(f"Iniciando RehaVR Backend...")
+    print(f"Servidor: http://{host}:{port}")
+    print(f"Modo debug: {debug}")
+    print(f"Entorno: {os.environ.get('FLASK_ENV', 'development')}")
     print("=" * 50)
     
     # Ejecutar la aplicación
