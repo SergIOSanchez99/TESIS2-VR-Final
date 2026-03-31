@@ -43,9 +43,9 @@ class MySQLConnectionManager:
                 pool_reset_session=True,
                 **{k: v for k, v in self.config.items() if k not in ['pool_size', 'pool_recycle']}
             )
-            logger.info("✅ Pool de conexiones MySQL creado exitosamente")
+            logger.info("Pool de conexiones MySQL creado exitosamente")
         except Exception as e:
-            logger.error(f"❌ Error al crear pool de conexiones: {e}")
+            logger.error(f"Error al crear pool de conexiones: {e}")
             raise
     
     @contextmanager
@@ -56,7 +56,7 @@ class MySQLConnectionManager:
             connection = self.connection_pool.get_connection()
             yield connection
         except Exception as e:
-            logger.error(f"❌ Error en conexión MySQL: {e}")
+            logger.error(f"Error en conexión MySQL: {e}")
             if connection:
                 connection.rollback()
             raise
@@ -88,12 +88,12 @@ class MySQLDatabaseManager:
             
             # Crear base de datos si no existe
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{config['database']}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
-            logger.info(f"✅ Base de datos '{config['database']}' verificada/creada")
+            logger.info(f"Base de datos '{config['database']}' verificada/creada")
             
             cursor.close()
             connection.close()
         except Exception as e:
-            logger.error(f"❌ Error al verificar base de datos: {e}")
+            logger.error(f"Error al verificar base de datos: {e}")
             raise
     
     def _create_tables(self):
@@ -252,12 +252,12 @@ class MySQLDatabaseManager:
                 
                 for table_name, sql in tables_sql.items():
                     cursor.execute(sql)
-                    logger.info(f"✅ Tabla '{table_name}' verificada/creada")
+                    logger.info(f"Tabla '{table_name}' verificada/creada")
                 
                 connection.commit()
                 cursor.close()
         except Exception as e:
-            logger.error(f"❌ Error al crear tablas: {e}")
+            logger.error(f"Error al crear tablas: {e}")
             raise
     
     def _hash_password(self, password: str) -> str:
@@ -293,7 +293,7 @@ class PacienteManager(MySQLDatabaseManager):
                 connection.commit()
                 cursor.close()
                 
-                logger.info(f"✅ Paciente '{nombre}' creado con ID: {paciente_id}")
+                logger.info(f"Paciente '{nombre}' creado con ID: {paciente_id}")
                 
                 return {
                     'id': paciente_id,
@@ -308,7 +308,7 @@ class PacienteManager(MySQLDatabaseManager):
                 raise ValueError("El email ya está registrado")
             raise
         except Exception as e:
-            logger.error(f"❌ Error al crear paciente: {e}")
+            logger.error(f"Error al crear paciente: {e}")
             raise
     
     def autenticar_paciente(self, email: str, password: str) -> Optional[Dict[str, Any]]:
@@ -330,13 +330,13 @@ class PacienteManager(MySQLDatabaseManager):
                 cursor.close()
                 
                 if paciente:
-                    logger.info(f"✅ Paciente '{email}' autenticado correctamente")
+                    logger.info(f"Paciente '{email}' autenticado correctamente")
                     return paciente
                 else:
-                    logger.warning(f"⚠️ Intento de autenticación fallido para '{email}'")
+                    logger.warning(f"Intento de autenticación fallido para '{email}'")
                     return None
         except Exception as e:
-            logger.error(f"❌ Error al autenticar paciente: {e}")
+            logger.error(f"Error al autenticar paciente: {e}")
             raise
     
     def obtener_paciente_por_id(self, paciente_id: int) -> Optional[Dict[str, Any]]:
@@ -353,7 +353,7 @@ class PacienteManager(MySQLDatabaseManager):
                 
                 return paciente
         except Exception as e:
-            logger.error(f"❌ Error al obtener paciente: {e}")
+            logger.error(f"Error al obtener paciente: {e}")
             raise
     
     def obtener_todos_pacientes(self) -> List[Dict[str, Any]]:
@@ -370,7 +370,7 @@ class PacienteManager(MySQLDatabaseManager):
                 
                 return pacientes
         except Exception as e:
-            logger.error(f"❌ Error al obtener pacientes: {e}")
+            logger.error(f"Error al obtener pacientes: {e}")
             raise
     
     def verificar_email_existe(self, email: str) -> bool:
@@ -387,7 +387,7 @@ class PacienteManager(MySQLDatabaseManager):
                 
                 return paciente is not None
         except Exception as e:
-            logger.error(f"❌ Error al verificar email: {e}")
+            logger.error(f"Error al verificar email: {e}")
             raise
 
 
@@ -414,7 +414,7 @@ class HistorialManager(MySQLDatabaseManager):
                 connection.commit()
                 cursor.close()
                 
-                logger.info(f"✅ Ejercicio registrado para paciente {paciente_id}")
+                logger.info(f"Ejercicio registrado para paciente {paciente_id}")
                 
                 return {
                     'id': ejercicio_id,
@@ -427,7 +427,7 @@ class HistorialManager(MySQLDatabaseManager):
                     'observaciones': observaciones
                 }
         except Exception as e:
-            logger.error(f"❌ Error al registrar ejercicio: {e}")
+            logger.error(f"Error al registrar ejercicio: {e}")
             raise
     
     def obtener_historial_paciente(self, paciente_id: int, limit: int = 50) -> List[Dict[str, Any]]:
@@ -449,7 +449,7 @@ class HistorialManager(MySQLDatabaseManager):
                 
                 return historial
         except Exception as e:
-            logger.error(f"❌ Error al obtener historial: {e}")
+            logger.error(f"Error al obtener historial: {e}")
             raise
 
 
@@ -476,7 +476,7 @@ class SesionTerapiaManager(MySQLDatabaseManager):
                 connection.commit()
                 cursor.close()
                 
-                logger.info(f"✅ Sesión de terapia creada para paciente {paciente_id}")
+                logger.info(f"Sesión de terapia creada para paciente {paciente_id}")
                 
                 return {
                     'id': sesion_id,
@@ -487,7 +487,7 @@ class SesionTerapiaManager(MySQLDatabaseManager):
                     'observaciones': observaciones
                 }
         except Exception as e:
-            logger.error(f"❌ Error al crear sesión: {e}")
+            logger.error(f"Error al crear sesión: {e}")
             raise
     
     def obtener_sesiones_paciente(self, paciente_id: int, limit: int = 20) -> List[Dict[str, Any]]:
@@ -509,7 +509,7 @@ class SesionTerapiaManager(MySQLDatabaseManager):
                 
                 return sesiones
         except Exception as e:
-            logger.error(f"❌ Error al obtener sesiones: {e}")
+            logger.error(f"Error al obtener sesiones: {e}")
             raise
 
 
@@ -520,7 +520,7 @@ class MySQLDatabaseService:
         self.pacientes = PacienteManager()
         self.historial = HistorialManager()
         self.sesiones = SesionTerapiaManager()
-        logger.info("✅ Servicio de base de datos MySQL inicializado")
+        logger.info("Servicio de base de datos MySQL inicializado")
     
     def test_connection(self) -> bool:
         """Prueba la conexión a la base de datos"""
@@ -532,7 +532,7 @@ class MySQLDatabaseService:
                 cursor.close()
                 return result[0] == 1
         except Exception as e:
-            logger.error(f"❌ Error en prueba de conexión: {e}")
+            logger.error(f"Error en prueba de conexión: {e}")
             return False
     
     def get_database_info(self) -> Dict[str, Any]:
@@ -574,5 +574,5 @@ class MySQLDatabaseService:
                     }
                 }
         except Exception as e:
-            logger.error(f"❌ Error al obtener información de BD: {e}")
+            logger.error(f"Error al obtener información de BD: {e}")
             raise
